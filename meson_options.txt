@@ -186,17 +186,17 @@ option('growfs', type : 'feature',
        description : 'install systemd-growfs, systemd-makefs, and associated files')
 option('hibernate', type : 'boolean',
        description : 'support for hibernation (requires sleep support)')
-option('homed', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
+option('homed', type : 'feature', value : 'disabled', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install the systemd-homed stack')
 option('hostnamed', type : 'boolean',
        description : 'install the systemd-hostnamed stack')
 option('hwdb', type : 'boolean',
        description : 'support for the hardware database')
-option('imds', type : 'feature',
+option('imds', type : 'feature', value : 'disabled',
        description : 'install the systemd-imds stack')
 option('imds-network', type : 'combo', choices : ['unlocked', 'locked'],
        description : 'whether to default to locked/unlocked IMDS network mode')
-option('importd', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
+option('importd', type : 'feature', value : 'disabled', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install the systemd-importd daemon')
 option('install-sysconfdir', type : 'combo', choices : ['true', 'no-samples', 'false'], value : 'true',
        description : 'install configuration files and directories')
@@ -210,45 +210,45 @@ option('localed', type : 'boolean',
        description : 'install the systemd-localed stack')
 option('logind', type : 'boolean',
        description : 'install the systemd-logind stack')
-option('machined', type : 'boolean',
+option('machined', type : 'boolean', value : false,
        description : 'install the systemd-machined stack')
 option('measure', type : 'feature',
        description : 'install the systemd-measure tool')
 option('mime', type : 'feature',
        description : 'install MIME type definitions')
-option('mountfsd', type : 'boolean',
+option('mountfsd', type : 'boolean', value : false,
        description : 'install the systemd-mountfsd stack')
-option('networkd', type : 'boolean',
+option('networkd', type : 'boolean', value : false,
        description : 'install the systemd-networkd stack')
 option('nspawn', type : 'feature',
        description : 'build and install systemd-nspawn')
-option('nsresourced', type : 'boolean',
+option('nsresourced', type : 'boolean', value : false,
        description : 'install the systemd-nsresourced stack')
 option('nss-myhostname', type : 'boolean',
        description : 'install nss-myhostname module')
-option('nss-mymachines', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
+option('nss-mymachines', type : 'feature', value : 'disabled', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install nss-mymachines module')
-option('nss-resolve', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
+option('nss-resolve', type : 'feature', value : 'disabled', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install nss-resolve module')
 option('nss-systemd', type : 'boolean',
        description : 'install nss-systemd module')
 option('oomd', type : 'boolean',
        description : 'install the userspace oom killer')
-option('portabled', type : 'boolean',
+option('portabled', type : 'boolean', value : false,
        description : 'install the systemd-portabled stack')
-option('pstore', type : 'boolean',
+option('pstore', type : 'boolean', value : false,
        description : 'install the pstore archival tool')
 option('quotacheck', type : 'boolean',
        description : 'support for the quotacheck tools')
 option('randomseed', type : 'boolean',
        description : 'install systemd-random-seed.service')
-option('remote', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
+option('remote', type : 'feature', value : 'disabled', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'support for "journal over the network"')
-option('repart', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
+option('repart', type : 'feature', value : 'disabled', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install the systemd-repart tool')
-option('report', type : 'feature',
+option('report', type : 'feature', value : 'disabled',
        description : 'install the systemd-report stack')
-option('resolve', type : 'boolean',
+option('resolve', type : 'boolean', value : false,
        description : 'systemd-resolved stack')
 option('rfkill', type : 'boolean',
        description : 'support for the rfkill tools')
@@ -256,15 +256,15 @@ option('sleep', type : 'feature',
        description : 'install systemd-sleep and associated files')
 option('storage', type : 'feature',
        description : 'install systemd-storage-block, systemd-storage-fs, storagectl, and associated files')
-option('storagetm', type : 'boolean',
+option('storagetm', type : 'boolean', value : false,
        description : 'support for Storage Target Mode')
-option('sysext', type : 'boolean',
+option('sysext', type : 'boolean', value : false,
        description : 'install the systemd-sysext stack')
 option('sysinstall', type : 'boolean',
        description : 'install the systemd-sysinstall tool')
-option('sysupdate', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
+option('sysupdate', type : 'feature', value : 'disabled', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install the systemd-sysupdate tool')
-option('sysupdated', type: 'combo', value : 'auto',
+option('sysupdated', type: 'combo', value : 'disabled',
        choices : ['auto', 'enabled', 'disabled'],
        description : 'install the systemd-sysupdated service')
 option('sysusers', type : 'boolean',
@@ -277,7 +277,7 @@ option('tpm', type : 'boolean',
        description : 'TPM should be used to log events and extend the registers')
 option('tmpfiles', type : 'boolean',
        description : 'support for tmpfiles.d')
-option('userdb', type : 'boolean',
+option('userdb', type : 'boolean', value : false,
        description : 'install the systemd-userdbd stack')
 option('ukify', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install ukify')
@@ -293,7 +293,7 @@ option('vconsole', type : 'boolean',
        description : 'support for vconsole configuration')
 option('veritysetup', type : 'feature',
        description : 'install systemd-veritysetup and associated files')
-option('vmspawn', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
+option('vmspawn', type : 'feature', value : 'disabled', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install the systemd-vmspawn tool')
 option('xdg-autostart', type : 'boolean',
        description : 'install the xdg-autostart-generator and unit')
