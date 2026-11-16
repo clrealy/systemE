@@ -10,7 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-or-later
 **Single source of truth.** Supersedes the phase lists in `FORK_STRATEGY.md` §6,
 `DIVERGENCE_PLAN.md` §4, `STRIP_PLAN.md` §5 and `RUST_PLAN.md` §6.
 Base: systemd `263~devel` @ `7386493f`. Branch: `ccr-795d0f2e-gn8btx`.
-**Status: decided. Phases A and B done and verified; C onwards not started.**
+**Status: decided. Phases A, B and C done and verified; D onwards not started.**
 
 ---
 
@@ -59,7 +59,7 @@ Dependencies are real: **E blocks both F and G.** That's what the sequencing dec
 |---|---|---|---|
 | **A** ✅ | **Disable commit.** *Done — `2363a83d`, `4a55c401`. 21 options flipped, 150 fewer installed files, 1,696 tests passed / 0 failed. See `SCOPE_DECISION.md`.* Flip 23 verified `meson_options.txt` defaults. Remove units for disabled components. Strip matching `test/` integration tests so CI stays green. Prepend the `AGENTS.md` review banner to `README.md` | `meson test -C build` clean; `--suite clang-tidy-<dir>` clean for any dir touched | ~1 day |
 | **B** ✅ | **First upstream sync.** *Done — history unshallowed (94,220 commits, tags recovered; our base is `v262-2499-g7386493f3b`), upstream merged clean, 1,696 tests passed / 0 failed. See the correction below.* `git remote add upstream` + `git fetch --unshallow --tags` (clone was shallow: 17 days of history, no tags). Sync with components disabled — this is the free dry run that proves the seam before anything irreversible | Full build + test green with everything off | ~1 day |
-| **C** | **Delete** the dropped directories. 319,192 LOC gone | Build green; repo is legibly a smaller project | ~1 day |
+| **C** ✅ | **Delete** the dropped directories. *Done — `5411b56af2`, `86cc5b506c`, `7596dab98a`. 1,597 files, ~355,700 lines, 33 build options; installed files 783 → 633; 1,629 tests passed / 0 failed.* | Build green; repo is legibly a smaller project | ~1 day |
 | **D** | **W1 — closure harness.** Per-binary linked LOC, symbol count, object closure, dlopen set. Baseline the *stripped* tree. CI gate that **fails when a tool's dependency closure grows** | Gate live and failing correctly on a deliberate regression | ~1 day |
 | **E** | **W2 — delaminate `libsystemd-shared`** (190,024 LOC) into tiers: `util` → `fmt` → `sys` → `crypto` → `net`. Cut lines chosen from D's data, not taste. Lower layers never call upward. One tier per topic branch | Each tier merges green independently; D's numbers move the right way | **weeks** (the bulk of the fork) |
 | **F** | **W3 — `standalone-binaries` from 5 → all leaf tools.** Includes fixing `rust_executable_template` (`meson.build:2299`) so Rust programs can static-link a slim tier instead of always needing libshared | Each conversion is one reviewable PR with a measured closure delta | ~2–4 days |
@@ -100,6 +100,7 @@ reported all of it. Unshallowing in Phase B gave the real numbers:
 | — of those, straddling | 74 (~1.4/week) | **622 (~12/week)** |
 | Commits touching the keep-set | 533 | **4,102 (44%)** |
 | Release cadence | ~2/year | **~4/year** (v261→v262: 94 days, 1,894 commits) |
+| DNS code evictable from libshared | 9,144 | **7,764** (`dns-domain.c` must stay: `conf-parser.c` and `user-record.c` use it) |
 
 **Every conclusion survives, and two get stronger.** The argument that a hand-edited rename is
 unrebaseable, and that W2 must land tier by tier, both rest on upstream velocity being high — it is
@@ -113,6 +114,44 @@ should be budgeted as a job.
 
 **Phase B also exposed a measurement lesson worth keeping:** never quote a rate from a shallow
 clone. `--since` cannot tell you it ran out of history.
+
+## Phase C result (verified)
+
+Landed as three commits, each green on its own:
+
+| | |
+|---|---|
+| Source directories deleted | 21 (862 files) |
+| Satellites deleted | 209 files (95 units, 171 man pages, 22 completions, 14 test fragments, 8 confs) |
+| Build options removed | 33 (289 → 256) |
+| Installed files | 783 → **633** |
+| Build | clean |
+| Tests | **1,629 passed, 0 failed, 32 skipped** |
+| Man pages | 1,130 build with `-Dman=enabled`; dist suite 253 passed, 0 failed |
+
+**Four more cross-gating bugs of the nspawn class**, where a file is gated on a component other
+than the one that owns it:
+
+1. `systemd-network-generator.service` had **no condition at all**, though its binary was built
+   only as part of the networkd stack.
+2. The four `systemd-sysupdate-notify-*` units are gated on `ENABLE_BOOTLOADER`, because bootctl
+   handles the notification, while sysupdate is what connects to the socket.
+3. zsh installed `_userdbctl` unconditionally where bash gated it on `ENABLE_USERDB`.
+4. `network/80-container-{vb,ve,vz}.link` are gated on networkd but configure **udev's** handling
+   of the veth links **nspawn** creates. Both of those stay, so the files now install
+   unconditionally — otherwise `99-default.link` matches instead and applies
+   `MACAddressPolicy=persistent` to container interfaces.
+
+`99-default.link`, which sets default interface naming for every NIC, is installed outside the
+networkd gate upstream, so naming was never at risk. Checked rather than assumed.
+
+**Deferred to Phase E:** `src/shared/dns-*.c` and the `resolve-*` helpers in `src/shared`. Evicting
+them touches the shared library the kept components link, which is delamination work, not deletion.
+
+**Known follow-ups:** `mkosi/` still carries drop-ins for components we no longer ship (deliberately
+untouched — `mkosi.repart/` is consumed by the *host's* repart to build test images); the restored
+`system-or-user-ns-mountfsd*.xml` man fragments still describe mountfsd and want a prose pass; and
+`po/POTFILES.skip` has pre-existing upstream staleness (`src/boot/efi/*`).
 
 ## Still open, deliberately
 
