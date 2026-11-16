@@ -10,7 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-or-later
 **Single source of truth.** Supersedes the phase lists in `FORK_STRATEGY.md` §6,
 `DIVERGENCE_PLAN.md` §4, `STRIP_PLAN.md` §5 and `RUST_PLAN.md` §6.
 Base: systemd `263~devel` @ `7386493f`. Branch: `ccr-795d0f2e-gn8btx`.
-**Status: fully decided, nothing implemented. No source file has been modified.**
+**Status: decided. Phase A implemented and verified; B onwards not started.**
 
 ---
 
@@ -57,7 +57,7 @@ Dependencies are real: **E blocks both F and G.** That's what the sequencing dec
 
 | Phase | Work | Gate to pass | Est. |
 |---|---|---|---|
-| **A** | **Disable commit.** Flip 23 verified `meson_options.txt` defaults. Remove units for disabled components. Strip matching `test/` integration tests so CI stays green. Prepend the `AGENTS.md` review banner to `README.md` | `meson test -C build` clean; `--suite clang-tidy-<dir>` clean for any dir touched | ~1 day |
+| **A** ✅ | **Disable commit.** *Done — `2363a83d`, `4a55c401`. 21 options flipped, 150 fewer installed files, 1,696 tests passed / 0 failed. See `SCOPE_DECISION.md`.* Flip 23 verified `meson_options.txt` defaults. Remove units for disabled components. Strip matching `test/` integration tests so CI stays green. Prepend the `AGENTS.md` review banner to `README.md` | `meson test -C build` clean; `--suite clang-tidy-<dir>` clean for any dir touched | ~1 day |
 | **B** | **First upstream sync.** `git remote add upstream` + `git fetch --unshallow --tags` (clone is shallow: 1,081 commits, no tags). Sync with components disabled — this is the free dry run that proves the seam before anything irreversible | Full build + test green with everything off | ~1 day |
 | **C** | **Delete** the dropped directories. 319,192 LOC gone | Build green; repo is legibly a smaller project | ~1 day |
 | **D** | **W1 — closure harness.** Per-binary linked LOC, symbol count, object closure, dlopen set. Baseline the *stripped* tree. CI gate that **fails when a tool's dependency closure grows** | Gate live and failing correctly on a deliberate regression | ~1 day |

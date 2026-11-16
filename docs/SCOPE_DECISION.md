@@ -8,7 +8,7 @@ SPDX-License-Identifier: LGPL-2.1-or-later
 # systemE — Scope Decision Record
 
 **Date:** 2026-11-16 · **Base:** systemd `263~devel` @ `7386493f` · **Branch:** `ccr-795d0f2e-gn8btx`
-**Status:** decided, not yet implemented. No source file has been modified.
+**Status:** decided. Phase A implemented and verified.
 
 Supersedes the open questions in `FORK_STRATEGY.md`, `DIVERGENCE_PLAN.md` and `STRIP_PLAN.md`.
 
@@ -55,28 +55,27 @@ varlink, 907 `sd_*` symbols, paths, env vars, kernel cmdline, journal fields, un
 
 ---
 
-## Phase A — the disable commit (ready to apply)
+## Phase A — the disable commit (done)
 
-All 23 option names verified present in `meson_options.txt`:
+**Implemented** in commit `2363a83d`. 21 options, not the 23 first listed: bare booleans default
+to `true` and bare features to `auto`, so each needs an explicit value.
 
 ```
--Dnetworkd=false -Ddefault-network=false
--Dresolve=false -Dnss-resolve=false
--Dmachined=false -Dnss-mymachines=false
--Dhomed=false -Duserdb=false -Dnsresourced=false
--Drepart=false
--Dsysupdate=false -Dsysupdated=false
--Dimportd=false -Dvmspawn=false -Dreport=false -Dportabled=false
--Dimds=false -Dimds-network=false
--Dsysext=false -Dmountfsd=false -Dstoragetm=false -Dpstore=false
--Dremote=false
+value : false       networkd, resolve, machined, userdb, nsresourced,
+                    portabled, sysext, mountfsd, storagetm, pstore
+value : 'disabled'  nss-resolve, nss-mymachines, homed, repart, sysupdate,
+                    importd, vmspawn, report, imds, remote, sysupdated
 ```
 
-Phase A flips these defaults in `meson_options.txt` so a plain `meson setup build` yields a systemE
-build, rather than relying on packagers passing flags.
+Two entries from the original list are deliberately untouched: `default-network` is already `false`
+upstream, and `imds-network` is a **combo** selecting the IMDS network mode (`unlocked`/`locked`),
+not an on/off switch — disabling `imds` covers it. Listing it here was an error.
+
+The defaults are flipped in `meson_options.txt` itself, so a plain `meson setup build` yields a
+systemE build rather than relying on packagers to pass flags.
 
 **Work in Phase A:**
-1. Flip the 23 defaults.
+1. Flip the defaults (21 options; see above).
 2. Remove units for disabled components (`units/meson.build` is already conditional — verify, don't
    assume).
 3. Strip the matching integration tests from `test/` so CI goes green, not red.
@@ -86,6 +85,32 @@ build, rather than relying on packagers passing flags.
    removed by a human reviewer, never by me.
 
 **Not in Phase A:** no directory deletions, no renames, no interface changes.
+
+### Phase A result (verified)
+
+Measured against a baseline configured from the unmodified options file, so the delta isolates this
+change rather than this container's missing dependencies:
+
+| | |
+|---|---|
+| Components moved to disabled | 20 / 20 |
+| Installed files | 783 → 633 (**150 removed**) |
+| Breakdown | 64 units, 34 executables, 36 network examples/configs, 7 polkit policies, 5 shell completions, 4 NSS modules |
+| Build | clean (2,312 targets) |
+| Tests | **1,696 passed, 0 failed, 32 skipped** |
+| clang-tidy | not applicable — no C changed |
+
+Items 2 and 3 above needed no work: upstream's `meson.build` files already `subdir_done()` on the
+component's own `ENABLE_*` key, so units and tests for disabled components drop out on their own.
+
+**One latent bug found and fixed** (`4a55c401`): `tmpfiles.d/systemd-nspawn.conf` was gated on
+`ENABLE_MACHINED` alone, but `/var/lib/machines` is where nspawn resolves `--machine=NAME`
+(`src/nspawn/nspawn.c:3058`) and the `--ephemeral` snapshot cleanup is nspawn's alone. Keeping
+nspawn while dropping machined is a combination upstream does not contemplate, so the directory
+and its cleanup silently vanished. Now gated on either component. This is the "silent keep-set
+dependency" risk from `STRIP_PLAN.md` §6.2, and a scan of every other install gate in
+`tmpfiles.d`, `sysusers.d`, `rules.d`, `presets` and `sysctl.d` found it to be the only one — all
+other gated files pair with their own component.
 
 ---
 
