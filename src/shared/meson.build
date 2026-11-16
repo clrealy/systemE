@@ -330,14 +330,6 @@ if conf.get('HAVE_LIBBPF') == 1
         shared_sources += files('bpf-link.c')
 endif
 
-if conf.get('ENABLE_REPORT') == 1
-        shared_sources += files('tsm-report.c')
-
-        if conf.get('HAVE_TPM2') == 1
-                shared_sources += files('tpm2-report.c')
-        endif
-endif
-
 if conf.get('HAVE_OPENSSL') == 1
         shared_sources += files('authenticode.c')
 endif

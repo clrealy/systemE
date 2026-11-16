@@ -433,12 +433,6 @@ static int parse_argv(int argc, char **argv,
 #if ENABLE_NSS_MYHOSTNAME
                                 "myhostname",
 #endif
-#if ENABLE_NSS_RESOLVE
-                                "resolve",
-#endif
-#if ENABLE_NSS_MYMACHINES
-                                "mymachines",
-#endif
                                 NULL);
         ASSERT_NOT_NULL(modules);
 

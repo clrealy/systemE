@@ -26,10 +26,9 @@ foreach f : files
         endif
 endforeach
 
-# /var/lib/machines is used by systemd-nspawn, which resolves --machine= below it, as well as by
-# systemd-machined, and the snapshot cleanup entries are nspawn's alone. Install it whenever
-# either one is enabled, rather than gating it on machined only.
-if conf.get('ENABLE_MACHINED') == 1 or conf.get('ENABLE_NSPAWN') == 1
+# /var/lib/machines is where systemd-nspawn resolves --machine=, and the snapshot cleanup entries
+# are nspawn's. Upstream gates this on machined, which systemE does not ship.
+if conf.get('ENABLE_NSPAWN') == 1
         install_data('systemd-nspawn.conf', install_dir : tmpfilesdir)
 endif
 
@@ -38,7 +37,6 @@ in_files = [
         ['20-systemd-osc-context.conf',   'LINK_OSC_CONTEXT_DROPIN'      ],
         ['20-systemd-ssh-generator.conf', 'ENABLE_SSH_PROXY_CONFIG'      ],
         ['20-systemd-stub.conf',          'ENABLE_EFI'                   ],
-        ['20-systemd-userdb.conf',        'ENABLE_SSH_USERDB_CONFIG'     ],
         ['etc.conf'                                                      ],
         ['legacy.conf',                   'ENABLE_COMPAT_SYSV_INTERFACES'],
         ['static-nodes-permissions.conf'                                 ],
