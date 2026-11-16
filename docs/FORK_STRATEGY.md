@@ -52,7 +52,7 @@ rename does not.
 | Unique `systemd.*` kernel cmdline options | 93 |
 | `https://github.com/systemd/systemd` links | 311 |
 | `systemd.io` links | 378 |
-| Upstream velocity | **1,081 commits / 103 authors** in the last 12 months |
+| Upstream velocity | **9,345 commits / 613 authors** in the last 12 months |
 
 That last row is the headline. **A hand-edited 48k-occurrence diff is not rebaseable** against
 ~1,100 commits a year. The rename has to be *generated*, not committed by hand. See §4.
@@ -148,14 +148,15 @@ greps for `systemd` still match.
 - Real divergence (behaviour changes) lives in **small topic branches** that merge into `systemE`,
   kept separate from the rebrand so each can be rebased independently.
 - **Merge, never rebase** `systemE` once it's pushed.
-- The clone is currently **shallow** (1,081 commits, no tags). First action of any execution phase:
+- The clone was **shallow** (17 days of history, no tags) until Phase B. First action of any execution phase:
   `git remote add upstream https://github.com/systemd/systemd && git fetch --unshallow --tags upstream`.
   Without tags we can't even name our base release properly.
 - Version scheme: track upstream's major and append ours — `263.0E`, next `263.1E`, bumping the
   major when we sync to 264. Keeps `meson.version` sortable and makes "which upstream are we on"
   answerable by anyone.
-- Sync cadence: upstream ships ~2 majors a year. Budget a sync sprint per major, plus cherry-picks
-  for CVEs. At 1,081 commits/yr from 103 authors, skipping two majors in a row is how forks die.
+- Sync cadence: upstream ships **~4 majors a year** (v261→v262 was 94 days, 1,894 commits).
+  Budget a sync sprint per major, plus cherry-picks for CVEs. At 9,345 commits/yr from 613
+  authors, skipping two majors in a row is how forks die.
 
 ---
 

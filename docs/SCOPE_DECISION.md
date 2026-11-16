@@ -119,8 +119,8 @@ other gated files pair with their own component.
 | Phase | Work |
 |---|---|
 | **A** | Disable commit (above) |
-| **B** | One full upstream sync with components off — proves the seam before anything irreversible. First step: `git fetch --unshallow --tags upstream` (the clone is shallow, 1,081 commits, no tags) |
-| **C** | Delete the dropped directories. Priced at ~1.4 straddling merge commits/week |
+| **B** | One full upstream sync with components off — proves the seam before anything irreversible. First step: `git fetch --unshallow --tags upstream` (the clone was shallow: 17 days, no tags) |
+| **C** | Delete the dropped directories. Priced at ~12 straddling merge commits/week |
 | **D** | W1 — closure measurement harness + CI gate that fails when a tool's dependency closure grows. Baselines the *stripped* tree |
 | **E** | W3 — extend `standalone-binaries` from 5 tools to every leaf tool |
 | **F** | W2 — delaminate `libsystemd-shared` (190,024 LOC) into layers, one tier per topic branch |

@@ -69,7 +69,7 @@ the smell was a linter, not a seam.
 **Consequences that are real, and that dlopen does not fix:**
 - No component can be built, tested, versioned, audited, or released independently.
 - There are **no stable internal interfaces** — `src/shared` is a free-for-all, so any change can
-  touch everything, which is exactly why 1,081 commits/year land as one undividable stream.
+  touch everything, which is exactly why 9,345 commits/year land as one undividable stream.
 - One shared security/CVE surface across 167 binaries.
 - You cannot replace one component with an alternative implementation, because the seam doesn't
   exist to replace it at.
@@ -148,7 +148,7 @@ don't invent a thing). This is what makes "replace one component" real.
 
 ## 5. Sequencing against upstream
 
-`FORK_STRATEGY.md` §4 holds, with one amendment: W2 produces **real conflicts** with 1,081
+`FORK_STRATEGY.md` §4 holds, with one amendment: W2 produces **real conflicts** with 9,345
 upstream commits/year, unlike a generated rename. So:
 
 - Each tier of W2 lands as its own topic branch and merges to `systemE` separately.

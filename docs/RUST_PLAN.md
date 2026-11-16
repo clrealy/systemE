@@ -55,7 +55,7 @@ The rate is the arguable number; the order of magnitude isn't. And upstream's `n
 makes it *slower* than normal Rust, not faster — no `Vec`, no `String`, no `Box` (`alloc` is
 banned), no `serde`, no `nix`, no `clap`. Every owned type is hand-rolled in the in-tree crate.
 
-Meanwhile upstream lands 1,081 commits/year into the C you're replacing.
+Meanwhile upstream lands 9,345 commits/year into the C you're replacing.
 
 **A full rewrite is not a plan, it's a way to fail slowly.** Every from-scratch Rust init has
 stalled at exactly this wall. I'm not going to help you walk into it — but the targeted version
@@ -98,7 +98,7 @@ reviewable by its existing C maintainers. We just want something else.
 
 | | Strip (W0) | Rust ports |
 |---|---|---|
-| Upstream commits/yr touching it | **176** (16%) | **533** (44%, the keep-set) |
+| Upstream commits/yr touching it | **2,062** (22%) | **4,102** (44%, the keep-set) |
 | Conflict shape | mostly "stay deleted" | permanent, in the hottest files in the tree |
 | Reversible | yes | not really |
 

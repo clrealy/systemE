@@ -22,9 +22,9 @@ Three reasons, all measured:
 1. **The build system already supports it.** 289 meson options, with per-component feature flags
    for essentially every candidate below. Stripping is largely `-Dnetworkd=false -Dresolve=false …`
    — not a patch.
-2. **Near-zero upstream conflict.** Only **176 of 1,081** commits (16%) in the last 12 months touch
-   any strip candidate. Compare the keep-set: **533** commits. We'd be walking away from the
-   quiet 16% of the tree, not the hot path.
+2. **We walk away from the quieter part of the tree.** **2,062 of 9,345** commits (22%) in the last
+   12 months touch a strip candidate, against **4,102** (44%) touching the keep-set. Disabling costs
+   nothing at all; deleting costs what §5 prices.
 3. **The seam is already clean.** I checked for cross-includes from the keep-set into the
    candidates: **zero**. Nothing in `core`, `udev`, `login`, `journal` or `shared` includes
    `libsystemd-network`, resolved internals, or any candidate's headers. The cut lines exist
@@ -102,9 +102,14 @@ These are not the same move and the difference is the whole maintenance story.
 **Option B — delete the directories**
 - 29% of `src/` actually gone. Repo becomes legibly a different, smaller project.
 - Priced it against real churn. Of the 176 candidate-touching commits in 12 months:
-  - **102 touch only deleted code** → trivially resolved, "stay deleted", seconds each.
-  - **74 straddle** deleted and kept code → real review work. That's **~1.4/week.**
-- So deletion costs roughly an hour a week of merge attention. **Affordable.**
+  - **1,440 touch only deleted code** → resolved as "stay deleted"; mechanical, and automatable
+    with `git rerere` or a merge driver.
+  - **622 straddle** deleted and kept code → need a human look. That's **~12/week.**
+- Note a straddling commit is not automatically a *conflict*: git only conflicts when the same
+  file is touched on both sides, and deletions surface as delete/modify, which resolve one way.
+  Most of the 622 will be trivial. But the honest headline is **~12 straddling commits a week, not
+  the ~1.4 first estimated** — a standing part-time maintenance cost rather than an hour a week.
+  **Still affordable, but budget it as a job, not a rounding error.**
 
 **My recommendation: A then B.** Disable in one day, run one full upstream sync with the components
 off, confirm nothing in the keep-set quietly needed them, *then* delete. The disable phase is a

@@ -10,7 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-or-later
 **Single source of truth.** Supersedes the phase lists in `FORK_STRATEGY.md` §6,
 `DIVERGENCE_PLAN.md` §4, `STRIP_PLAN.md` §5 and `RUST_PLAN.md` §6.
 Base: systemd `263~devel` @ `7386493f`. Branch: `ccr-795d0f2e-gn8btx`.
-**Status: decided. Phase A implemented and verified; B onwards not started.**
+**Status: decided. Phases A and B done and verified; C onwards not started.**
 
 ---
 
@@ -58,7 +58,7 @@ Dependencies are real: **E blocks both F and G.** That's what the sequencing dec
 | Phase | Work | Gate to pass | Est. |
 |---|---|---|---|
 | **A** ✅ | **Disable commit.** *Done — `2363a83d`, `4a55c401`. 21 options flipped, 150 fewer installed files, 1,696 tests passed / 0 failed. See `SCOPE_DECISION.md`.* Flip 23 verified `meson_options.txt` defaults. Remove units for disabled components. Strip matching `test/` integration tests so CI stays green. Prepend the `AGENTS.md` review banner to `README.md` | `meson test -C build` clean; `--suite clang-tidy-<dir>` clean for any dir touched | ~1 day |
-| **B** | **First upstream sync.** `git remote add upstream` + `git fetch --unshallow --tags` (clone is shallow: 1,081 commits, no tags). Sync with components disabled — this is the free dry run that proves the seam before anything irreversible | Full build + test green with everything off | ~1 day |
+| **B** ✅ | **First upstream sync.** *Done — history unshallowed (94,220 commits, tags recovered; our base is `v262-2499-g7386493f3b`), upstream merged clean, 1,696 tests passed / 0 failed. See the correction below.* `git remote add upstream` + `git fetch --unshallow --tags` (clone was shallow: 17 days of history, no tags). Sync with components disabled — this is the free dry run that proves the seam before anything irreversible | Full build + test green with everything off | ~1 day |
 | **C** | **Delete** the dropped directories. 319,192 LOC gone | Build green; repo is legibly a smaller project | ~1 day |
 | **D** | **W1 — closure harness.** Per-binary linked LOC, symbol count, object closure, dlopen set. Baseline the *stripped* tree. CI gate that **fails when a tool's dependency closure grows** | Gate live and failing correctly on a deliberate regression | ~1 day |
 | **E** | **W2 — delaminate `libsystemd-shared`** (190,024 LOC) into tiers: `util` → `fmt` → `sys` → `crypto` → `net`. Cut lines chosen from D's data, not taste. Lower layers never call upward. One tier per topic branch | Each tier merges green independently; D's numbers move the right way | **weeks** (the bulk of the fork) |
@@ -80,10 +80,39 @@ rewrite (~82 person-years, see `RUST_PLAN.md` §2). Any change to the frozen int
   far better than scattered hunks.
 - D's closure gate runs on every sync, so an upstream merge that silently re-couples something
   fails loudly instead of rotting.
-- Budget: strip touches the quiet **16%** of upstream's churn (176 of 1,081 commits/yr). Rust ports
-  land in the hot **44%** (533 commits/yr). Deletion costs ~1.4 straddling merge commits/week.
+- Budget: strip touches **22%** of upstream's churn (2,062 of 9,345 commits/yr). Rust ports land in
+  the hot **44%** (4,102 commits/yr). Deletion costs ~12 straddling merge commits/week.
 
 ---
+
+## Correction recorded in Phase B
+
+The figures in the first five documents were computed on the **shallow clone**, which held only
+**17 days** of history (2026-10-30 to 2026-11-16) while `git log --since="12 months ago"` silently
+reported all of it. Unshallowing in Phase B gave the real numbers:
+
+| | First stated | Actual |
+|---|---|---|
+| Upstream commits / 12 months | 1,081 | **9,345** |
+| Distinct authors / 12 months | 103 | **613** |
+| Commits touching dropped code | 176 (16%) | **2,062 (22%)** |
+| — of those, drop-only | 102 | **1,440** |
+| — of those, straddling | 74 (~1.4/week) | **622 (~12/week)** |
+| Commits touching the keep-set | 533 | **4,102 (44%)** |
+| Release cadence | ~2/year | **~4/year** (v261→v262: 94 days, 1,894 commits) |
+
+**Every conclusion survives, and two get stronger.** The argument that a hand-edited rename is
+unrebaseable, and that W2 must land tier by tier, both rest on upstream velocity being high — it is
+8.6× higher than stated. "Rust ports land in the hot 44%" happened to be exactly right.
+
+**One decision input genuinely changed:** Phase C deletion was priced at ~1.4 straddling merges per
+week and called "about an hour a week." It is **~12 a week**. That is a standing part-time cost, not
+a rounding error. Phase C still stands — most straddling commits are not true conflicts, since git
+only conflicts when the same file is touched on both sides and deletions resolve one way — but it
+should be budgeted as a job.
+
+**Phase B also exposed a measurement lesson worth keeping:** never quote a rate from a shallow
+clone. `--since` cannot tell you it ran out of history.
 
 ## Still open, deliberately
 
