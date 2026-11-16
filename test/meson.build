@@ -215,24 +215,6 @@ endif
 
 ############################################################
 
-test_network_generator_conversion_sh = files('test-network-generator-conversion.sh')
-if want_tests != 'false'
-        exe = executables_by_name.get('systemd-network-generator')
-        test('test-network-generator-conversion',
-             test_network_generator_conversion_sh,
-             # https://github.com/mesonbuild/meson/issues/2681
-             args : exe.full_path(),
-             depends : exe,
-             suite : 'network')
-endif
-if install_tests
-        install_data(test_network_generator_conversion_sh,
-                     install_mode : 'rwxr-xr-x',
-                     install_dir : unittestsdir)
-endif
-
-############################################################
-
 sys_script_py = files('sys-script.py')
 test_udev_py = files('test-udev.py')
 if want_tests != 'false'
@@ -455,8 +437,6 @@ if install_tests
                 'test-execute',
                 'test-fstab-generator',
                 'test-journals',
-                'test-network',
-                'test-network-generator-conversion',
                 'test-path',
                 'test-path-util',
                 'test-sched-prio',

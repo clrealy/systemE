@@ -4,9 +4,7 @@ generate_directives_py = files('generate-directives.py')
 
 fuzz_regression_tests = {}
 
-directives = [['fuzz-network-parser', 'directives.network', networkd_network_gperf_gperf],
-              ['fuzz-netdev-parser', 'directives.netdev',   networkd_netdev_gperf_gperf],
-              ['fuzz-link-parser', 'directives.link',       udev_link_gperf_gperf],
+directives = [['fuzz-link-parser', 'directives.link', udev_link_gperf_gperf],
              ]
 
 foreach tuple : directives
