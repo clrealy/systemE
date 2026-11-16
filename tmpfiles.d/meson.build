@@ -11,7 +11,6 @@ files = [['README'                                  ],
          ['portables.conf',       'ENABLE_PORTABLED'],
          ['systemd-network.conf', 'ENABLE_NETWORKD' ],
          ['systemd-nologin.conf', 'HAVE_PAM'        ],
-         ['systemd-nspawn.conf',  'ENABLE_MACHINED' ],
          ['systemd-pstore.conf',  'ENABLE_PSTORE'   ],
          ['systemd-resolve.conf', 'ENABLE_RESOLVE'  ],
          ['20-systemd-varlink.conf'                 ],
@@ -30,6 +29,13 @@ foreach f : files
                         .format(f[0], f[1], conf.get(f[1], 0)))
         endif
 endforeach
+
+# /var/lib/machines is used by systemd-nspawn, which resolves --machine= below it, as well as by
+# systemd-machined, and the snapshot cleanup entries are nspawn's alone. Install it whenever
+# either one is enabled, rather than gating it on machined only.
+if conf.get('ENABLE_MACHINED') == 1 or conf.get('ENABLE_NSPAWN') == 1
+        install_data('systemd-nspawn.conf', install_dir : tmpfilesdir)
+endif
 
 in_files = [
         ['20-systemd-shell-extra.conf',   'LINK_SHELL_EXTRA_DROPIN'      ],
