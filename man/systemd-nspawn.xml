@@ -2086,8 +2086,6 @@ After=sys-subsystem-net-devices-ens1.device</programlisting>
   <refsect1>
     <title>Examples</title>
 
-    <xi:include href="importctl.xml" xpointer="example-import-tar" />
-
     <example>
       <title>Build and boot a minimal Fedora distribution in a container</title>
 
