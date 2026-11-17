@@ -8,12 +8,7 @@ files = [['README'                                  ],
          ['home.conf'                               ],
          ['root.conf'                               ],
          ['journal-nocow.conf'                      ],
-         ['portables.conf',       'ENABLE_PORTABLED'],
-         ['systemd-network.conf', 'ENABLE_NETWORKD' ],
          ['systemd-nologin.conf', 'HAVE_PAM'        ],
-         ['systemd-nspawn.conf',  'ENABLE_MACHINED' ],
-         ['systemd-pstore.conf',  'ENABLE_PSTORE'   ],
-         ['systemd-resolve.conf', 'ENABLE_RESOLVE'  ],
          ['20-systemd-varlink.conf'                 ],
          ['systemd-tmp.conf'                        ],
          ['tmp.conf'                                ],
@@ -31,12 +26,17 @@ foreach f : files
         endif
 endforeach
 
+# /var/lib/machines is where systemd-nspawn resolves --machine=, and the snapshot cleanup entries
+# are nspawn's. Upstream gates this on machined, which systemE does not ship.
+if conf.get('ENABLE_NSPAWN') == 1
+        install_data('systemd-nspawn.conf', install_dir : tmpfilesdir)
+endif
+
 in_files = [
         ['20-systemd-shell-extra.conf',   'LINK_SHELL_EXTRA_DROPIN'      ],
         ['20-systemd-osc-context.conf',   'LINK_OSC_CONTEXT_DROPIN'      ],
         ['20-systemd-ssh-generator.conf', 'ENABLE_SSH_PROXY_CONFIG'      ],
         ['20-systemd-stub.conf',          'ENABLE_EFI'                   ],
-        ['20-systemd-userdb.conf',        'ENABLE_SSH_USERDB_CONFIG'     ],
         ['etc.conf'                                                      ],
         ['legacy.conf',                   'ENABLE_COMPAT_SYSV_INTERFACES'],
         ['static-nodes-permissions.conf'                                 ],

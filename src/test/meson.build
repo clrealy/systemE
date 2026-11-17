@@ -520,11 +520,6 @@ executables += [
                 'type' : 'manual',
         },
         test_template + {
-                'sources' : files('test-qmp-client-qemu.c'),
-                'import' : ['systemd-vmspawn'],
-                'conditions' : ['ENABLE_VMSPAWN'],
-        },
-        test_template + {
                 'sources' : files('test-random-util.c'),
                 'timeout' : 120,
         },
@@ -572,11 +567,6 @@ executables += [
         test_template + {
                 'sources' : files('test-utmp.c'),
                 'conditions' : ['ENABLE_UTMP'],
-        },
-        test_template + {
-                'sources' : files('test-varlink-idl-machine.c'),
-                'import' : ['systemd-machined'],
-                'conditions' : ['ENABLE_MACHINED'],
         },
         test_template + {
                 'sources' : files('test-varlink-idl-login.c'),

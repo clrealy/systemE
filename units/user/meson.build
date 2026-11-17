@@ -10,39 +10,6 @@ units = [
         { 'file' : 'exit.target' },
         { 'file' : 'graphical-session-pre.target' },
         { 'file' : 'graphical-session.target' },
-        {
-          'file' : 'machine.slice',
-          'conditions' : ['ENABLE_MACHINED'],
-        },
-        {
-          'file' : 'machines.target',
-          'conditions' : ['ENABLE_MACHINED'],
-        },
-        {
-          'file' : 'systemd-machined.service.in',
-          'conditions' : ['ENABLE_MACHINED'],
-          'symlinks' : ['dbus-org.freedesktop.machine1.service'],
-        },
-        {
-          'file' : 'systemd-machined.socket',
-          'conditions' : ['ENABLE_MACHINED'],
-          'symlinks' : ['sockets.target.wants/'],
-        },
-        {
-          'file' : 'systemd-importd.service.in',
-          'conditions' : ['ENABLE_IMPORTD'],
-          'symlinks' : ['dbus-org.freedesktop.import1.service'],
-        },
-        {
-          'file' : 'systemd-importd.socket',
-          'conditions' : ['ENABLE_IMPORTD'],
-          'symlinks' : ['sockets.target.wants/'],
-        },
-        {
-          'file' : 'systemd-portabled.service.in',
-          'conditions' : ['ENABLE_PORTABLED'],
-          'symlinks' : ['dbus-org.freedesktop.portable1.service'],
-        },
         { 'file' : 'systemd-ptybrokerd.service.in' },
         {
           'file' : 'systemd-ptybrokerd.socket',
@@ -81,10 +48,6 @@ units = [
         {
           'file' : 'systemd-nspawn@.service.in',
           'conditions' : ['ENABLE_NSPAWN'],
-        },
-        {
-          'file' : 'systemd-vmspawn@.service.in',
-          'conditions' : ['ENABLE_VMSPAWN'],
         },
         { 'file' : 'timers.target' },
         {

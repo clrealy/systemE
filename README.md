@@ -1,4 +1,7 @@
-![Systemd](http://brand.systemd.io/assets/page-logo.png)
+> [!IMPORTANT]
+> Remove this line to confirm you've reviewed this PR before submitting.
+
+![systemE](docs/assets/brand/systemE-wordmark.png)
 
 System and Service Manager
 
@@ -23,6 +26,10 @@ Assorted, older, general information about systemd can be found in the [systemd 
 Information about build requirements is provided in the [README file](README).
 
 Consult our [NEWS file](NEWS) for information about what's new in the most recent systemd versions.
+
+To build and install, run `./install.sh`. It stages the result into `dest/` so you can see what would be installed; `sudo ./install.sh --system` (or `doas`), as root, installs over the running machine. Read the warning it prints before you do that on a system you care about.
+
+Please see the [systemE Fork Roadmap](docs/ROADMAP.md) for the plan governing this fork, its decided scope, and what is deliberately frozen.
 
 Please see the [Code Map](docs/ARCHITECTURE.md) for information about this repository's layout and content.
 

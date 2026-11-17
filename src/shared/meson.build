@@ -15,13 +15,11 @@ shared_sources = files(
         'blkid-util.c',
         'blockdev-list.c',
         'blockdev-util.c',
-        'bond-util.c',
         'boot-entry.c',
         'boot-timestamps.c',
         'bootspec.c',
         'bpf-program.c',
         'bpf-util.c',
-        'bridge-util.c',
         'btrfs-util.c',
         'bus-get-properties.c',
         'bus-locator.c',
@@ -63,12 +61,7 @@ shared_sources = files(
         'discover-image.c',
         'dissect-image.c',
         'dm-util.c',
-        'dns-answer.c',
         'dns-domain.c',
-        'dns-packet.c',
-        'dns-question.c',
-        'dns-rr.c',
-        'dns-type.c',
         'dropin.c',
         'edit-util.c',
         'efi-api.c',
@@ -91,7 +84,6 @@ shared_sources = files(
         'fsprg-openssl.c',
         'fstab-util.c',
         'generator.c',
-        'geneve-util.c',
         'gnutls-util.c',
         'gpt.c',
         'group-record.c',
@@ -113,7 +105,6 @@ shared_sources = files(
         'io-uring-filter.c',
         'ioprio-util.c',
         'ip-protocol-list.c',
-        'ipvlan-util.c',
         'journal-authenticate.c',
         'journal-file-util.c',
         'journal-importer.c',
@@ -143,7 +134,6 @@ shared_sources = files(
         'machine-register.c',
         'machine-tags.c',
         'machine-util.c',
-        'macvlan-util.c',
         'main-func.c',
         'manifest-util.c',
         'metrics.c',
@@ -196,7 +186,6 @@ shared_sources = files(
         'recovery-key.c',
         'reread-partition-table.c',
         'resize-fs.c',
-        'resolve-hook-util.c',
         'resolve-util.c',
         'resolve-varlink-util.c',
         'rm-rf.c',
@@ -228,7 +217,6 @@ shared_sources = files(
         'unit-file.c',
         'unit-result.c',
         'user-record-nss.c',
-        'user-record-show.c',
         'user-record.c',
         'userdb-dropin.c',
         'userdb.c',
@@ -267,7 +255,6 @@ shared_sources = files(
         'varlink-io.systemd.Report.Uploader.c',
         'varlink-io.systemd.Resolve.c',
         'varlink-io.systemd.Resolve.Hook.c',
-        'varlink-io.systemd.Resolve.Link.c',
         'varlink-io.systemd.Resolve.Monitor.c',
         'varlink-io.systemd.ResourceProvider.c',
         'varlink-io.systemd.Shutdown.c',
@@ -291,7 +278,6 @@ shared_sources = files(
         'verb-log-control.c',
         'verbs.c',
         'vfat-util.c',
-        'vlan-util.c',
         'voa-util.c',
         'volatile-util.c',
         'vpick.c',
@@ -328,14 +314,6 @@ endif
 
 if conf.get('HAVE_LIBBPF') == 1
         shared_sources += files('bpf-link.c')
-endif
-
-if conf.get('ENABLE_REPORT') == 1
-        shared_sources += files('tsm-report.c')
-
-        if conf.get('HAVE_TPM2') == 1
-                shared_sources += files('tpm2-report.c')
-        endif
 endif
 
 if conf.get('HAVE_OPENSSL') == 1
@@ -394,41 +372,6 @@ ethtool_link_mode_xml = custom_target(
         capture : true)
 man_page_depends += ethtool_link_mode_xml
 
-dns_type_list_txt = custom_target(
-        input : ['generate-dns_type-list.sed', 'dns-type.h'],
-        output : 'dns_type-list.txt',
-        command : [sed, '-n', '-r', '-f', '@INPUT0@', '@INPUT1@'],
-        capture : true)
-
-gperf_file = custom_target(
-        input : dns_type_list_txt,
-        output : 'dns_type-from-name.gperf',
-        command : [python,
-                   files('generate-dns_type-gperf.py'),
-                   'dns_type',
-                   'DNS_TYPE_',
-                   '@INPUT@'],
-        capture : true)
-
-dns_type_from_name_inc = custom_target(
-        input : gperf_file,
-        output : 'dns_type-from-name.inc',
-        command : [gperf_cmdline,
-                   '-L', 'ANSI-C', '-t', '--ignore-case',
-                   '-N', 'lookup_dns_type',
-                   '-H', 'hash_dns_type_name',
-                   '-p', '-C',
-                   '@INPUT@'],
-        capture : true)
-
-dns_type_to_name_inc = custom_target(
-        input : ['dns_type-to-name.awk', dns_type_list_txt],
-        output : 'dns_type-to-name.inc',
-        command : [awk, '-f', '@INPUT0@', '@INPUT1@'],
-        capture : true)
-
-generated_sources += [dns_type_from_name_inc, dns_type_to_name_inc]
-shared_sources += [dns_type_from_name_inc, dns_type_to_name_inc]
 
 libshared_name = 'systemd-shared-@0@'.format(shared_lib_tag)
 

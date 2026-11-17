@@ -207,14 +207,15 @@ static const MountPoint mount_table[] = {
                 .flags = MS_NOSUID|MS_NOEXEC|MS_NODEV,
                 .mode = MNT_FATAL|MNT_IN_CONTAINER|MNT_CHECK_WRITABLE,
         },
-#if ENABLE_PSTORE
+        /* Upstream mounts this only with systemd-pstore enabled, which was the default. systemE does
+         * not ship that tool, but /sys/fs/pstore is a kernel filesystem independent of it and still
+         * worth mounting so its contents can be read, so keep it unconditional. */
         {
                 .what = "pstore",
                 .where = "/sys/fs/pstore",
                 .type = "pstore",
                 .flags = MS_NOSUID|MS_NOEXEC|MS_NODEV,
         },
-#endif
 #if ENABLE_EFI
         {
                 .what = "efivarfs",

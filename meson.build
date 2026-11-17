@@ -1108,14 +1108,8 @@ conf.set_quoted('VAR_LOG_MODE', var_log_mode)
 kill_user_processes = get_option('default-kill-user-processes')
 conf.set10('KILL_USER_PROCESSES', kill_user_processes)
 
-dns_servers = get_option('dns-servers')
-conf.set_quoted('DNS_SERVERS', dns_servers)
-
 ntp_servers = get_option('ntp-servers')
 conf.set_quoted('NTP_SERVERS', ntp_servers)
-
-geoip_endpoint = get_option('geoip-endpoint')
-conf.set_quoted('GEOIP_ENDPOINT', geoip_endpoint)
 
 default_locale = get_option('default-locale')
 conf.set_quoted('SYSTEMD_DEFAULT_LOCALE', default_locale)
@@ -1674,38 +1668,6 @@ endif
 dmi_arches = ['x86', 'x86_64', 'aarch64', 'arm', 'ia64', 'loongarch64', 'mips', 'riscv64']
 conf.set10('HAVE_DMI', host_machine.cpu_family() in dmi_arches)
 
-dns_over_tls = get_option('dns-over-tls')
-have_openssl = conf.get('HAVE_OPENSSL') == 1
-if dns_over_tls == 'false'
-        have = false
-elif dns_over_tls == 'auto'
-        have = have_openssl
-elif have_openssl
-        have = true
-else
-        error('DNS-over-TLS support was requested, but OpenSSL support is disabled.')
-endif
-conf.set10('ENABLE_DNS_OVER_TLS', have)
-
-default_dns_over_tls = get_option('default-dns-over-tls')
-if default_dns_over_tls != 'no' and conf.get('ENABLE_DNS_OVER_TLS') == 0
-        message('default-dns-over-tls cannot be enabled or set to opportunistic when DNS-over-TLS support is disabled. Setting default-dns-over-tls to no.')
-        default_dns_over_tls = 'no'
-endif
-conf.set('DEFAULT_DNS_OVER_TLS_MODE',
-         'DNS_OVER_TLS_' + default_dns_over_tls.underscorify().to_upper())
-conf.set_quoted('DEFAULT_DNS_OVER_TLS_MODE_STR', default_dns_over_tls)
-
-default_mdns = get_option('default-mdns')
-conf.set('DEFAULT_MDNS_MODE',
-         'RESOLVE_SUPPORT_' + default_mdns.to_upper())
-conf.set_quoted('DEFAULT_MDNS_MODE_STR', default_mdns)
-
-default_llmnr = get_option('default-llmnr')
-conf.set('DEFAULT_LLMNR_MODE',
-         'RESOLVE_SUPPORT_' + default_llmnr.to_upper())
-conf.set_quoted('DEFAULT_LLMNR_MODE_STR', default_llmnr)
-
 have = get_option('measure').require(
         conf.get('HAVE_BLKID') == 1 and
         conf.get('HAVE_OPENSSL') == 1 and
@@ -1713,90 +1675,9 @@ have = get_option('measure').require(
         error_message : 'blkid, openssl, and tpm2 required for systemd-measure').allowed()
 conf.set10('ENABLE_MEASURE', have)
 
-have = get_option('repart').require(
-        conf.get('HAVE_LIBFDISK') == 1,
-        error_message : 'fdisk required').allowed()
-conf.set10('ENABLE_REPART', have)
-
-conf.set10('ENABLE_REPORT', get_option('report').allowed())
-
-default_dnssec = get_option('default-dnssec')
-if default_dnssec != 'no' and conf.get('HAVE_OPENSSL') == 0
-        message('default-dnssec cannot be set to yes or allow-downgrade when openssl is disabled. Setting default-dnssec to no.')
-        default_dnssec = 'no'
-endif
-conf.set('DEFAULT_DNSSEC_MODE',
-         'DNSSEC_' + default_dnssec.underscorify().to_upper())
-conf.set_quoted('DEFAULT_DNSSEC_MODE_STR', default_dnssec)
-
-have = get_option('imds').require(
-        conf.get('HAVE_LIBCURL') == 1,
-        error_message : 'curl required').allowed()
-conf.set10('ENABLE_IMDS', have)
-conf.set('IMDS_NETWORK_DEFAULT', 'IMDS_NETWORK_@0@'.format(get_option('imds-network')).to_upper())
-
-have = get_option('importd').require(
-        conf.get('HAVE_LIBCURL') == 1 and
-        conf.get('HAVE_OPENSSL') == 1 and
-        conf.get('HAVE_ZLIB') == 1 and
-        conf.get('HAVE_XZ') == 1,
-        error_message : 'curl, openssl, zlib and xz required').allowed()
-conf.set10('ENABLE_IMPORTD', have)
-
-have = get_option('sysupdate').require(
-        conf.get('ENABLE_IMPORTD') == 1 and
-        conf.get('HAVE_OPENSSL') == 1 and
-        conf.get('HAVE_LIBFDISK') == 1,
-        error_message : 'systemd-importd, fdisk, and openssl required').allowed()
-conf.set10('ENABLE_SYSUPDATE', have)
-
-have2 = get_option('sysupdated')
-if have2 == 'enabled'
-        if have
-                have2 = true
-        else
-                error('sysupdated requires sysupdate to be enabled')
-        endif
-elif have2 == 'auto'
-        have2 = have and conf.get('BUILD_MODE_DEVELOPER') == 1
-else
-        have2 = false
-endif
-conf.set10('ENABLE_SYSUPDATED', have2)
-
-conf.set10('ENABLE_STORAGETM', get_option('storagetm'))
-
-have = get_option('homed').require(
-        conf.get('HAVE_LIBCRYPT') == 1 and
-        conf.get('HAVE_OPENSSL') == 1 and
-        conf.get('HAVE_LIBFDISK') == 1 and
-        conf.get('HAVE_LIBCRYPTSETUP') == 1,
-        error_message : 'libcrypt, openssl, fdisk, and libcryptsetup required').allowed()
-conf.set10('ENABLE_HOMED', have)
-
-have = have and conf.get('HAVE_PAM') == 1
-conf.set10('ENABLE_PAM_HOME', have)
-
-feature = get_option('remote')
-if feature.enabled()
-        if conf.get('HAVE_MICROHTTPD') != 1
-                error('remote support was requested, but microhttpd is not available')
-        endif
-        if conf.get('HAVE_LIBCURL') != 1
-                error('remote support was requested, but libcurl is not available')
-        endif
-endif
-# A more minimal version of systemd-journal-remote can always be built, even if neither
-# libcurl nor microhttpd are available.
-conf.set10('ENABLE_REMOTE', feature.allowed())
-
-feature = get_option('vmspawn').disable_auto_if(conf.get('BUILD_MODE_DEVELOPER') == 0)
-conf.set10('ENABLE_VMSPAWN', feature.allowed())
-
 feature = get_option('nspawn')
 conf.set10('ENABLE_NSPAWN', feature.allowed())
 
-conf.set10('DEFAULT_MOUNTFSD_TRUSTED_DIRECTORIES', get_option('default-mountfsd-trusted-directories'))
 
 conf.set10('ENABLE_BATTERY_CHECK', get_option('battery-check').allowed())
 conf.set10('ENABLE_CLONESETUP', get_option('clonesetup').allowed())
@@ -1841,21 +1722,13 @@ foreach tuple : [
                 ['ldconfig'],
                 ['localed'],
                 ['logind'],
-                ['machined'],
-                ['mountfsd'],
-                ['networkd'],
-                ['nsresourced'],
                 ['nss-myhostname',  get_option('libc') != 'musl', 'musl does not support it'],
                 ['nss-systemd',     get_option('libc') != 'musl', 'musl does not support it'],
                 ['oomd'],
-                ['portabled'],
-                ['pstore'],
                 ['quotacheck'],
                 ['randomseed'],
-                ['resolve'],
                 ['rfkill'],
                 ['smack'],
-                ['sysext'],
                 ['sysinstall'],
                 ['sysusers'],
                 ['timedated'],
@@ -1863,7 +1736,6 @@ foreach tuple : [
                 ['tmpfiles'],
                 ['tpm'],
                 ['utmp',            get_option('libc') != 'musl', 'musl does not support it'],
-                ['userdb'],
                 ['varlink-monitord'],
                 ['varlink-sftp'],
                 ['vconsole'],
@@ -1882,30 +1754,9 @@ endforeach
 
 enable_sysusers = conf.get('ENABLE_SYSUSERS') == 1
 
-foreach tuple : [['nss-mymachines', 'machined'],
-                 ['nss-resolve',    'resolve']]
-        want = get_option(tuple[0])
-        if want.enabled()
-                if get_option('libc') == 'musl'
-                        error('@0@ is requested but musl does not support it'.format(tuple[0]))
-                endif
-                if not get_option(tuple[1])
-                        error('@0@ is requested but @1@ is disabled'.format(tuple[0], tuple[1]))
-                endif
-                have = true
-        elif want.allowed()
-                have = get_option(tuple[1]) and get_option('libc') != 'musl'
-        else
-                have = false
-        endif
-        name = 'ENABLE_' + tuple[0].underscorify().to_upper()
-        conf.set10(name, have)
-endforeach
 
 enable_nss = false
 foreach term : ['ENABLE_NSS_MYHOSTNAME',
-                'ENABLE_NSS_MYMACHINES',
-                'ENABLE_NSS_RESOLVE',
                 'ENABLE_NSS_SYSTEMD']
         if conf.get(term) == 1
                 enable_nss = true
@@ -1916,7 +1767,6 @@ conf.set10('ENABLE_NSS', enable_nss)
 conf.set10('ENABLE_TIMEDATECTL', get_option('timedated') or get_option('timesyncd'))
 
 conf.set10('ENABLE_SSH_PROXY_CONFIG', sshconfdir != 'no')
-conf.set10('ENABLE_SSH_USERDB_CONFIG', conf.get('ENABLE_USERDB') == 1 and sshdconfdir != 'no')
 
 conf.set10('SYSTEMD_SLOW_TESTS_DEFAULT', want_slow_tests)
 
@@ -2389,7 +2239,6 @@ subdir('units')
 # systemd-analyze requires 'libcore'
 subdir('src/core')
 # systemd-networkd requires 'libsystemd_network'
-subdir('src/libsystemd-network')
 # hwdb requires 'udev_link_with' and 'udev_rpath'
 subdir('src/udev')
 
@@ -2424,52 +2273,37 @@ subdir('src/getty-generator')
 subdir('src/gpt-auto-generator')
 subdir('src/growfs')
 subdir('src/hibernate-resume')
-subdir('src/home')
 subdir('src/hostname')
 subdir('src/hwdb')
 subdir('src/id128')
-subdir('src/import')
-subdir('src/imds') # Note, we are not alphabetically here, since we want to use a variable from src/import/ here
 subdir('src/integritysetup')
 subdir('src/journal')
-subdir('src/journal-remote')
 subdir('src/kernel-install')
 subdir('src/keyring-setup')
 subdir('src/keyutil')
 subdir('src/locale')
 subdir('src/login')
-subdir('src/machine')
 subdir('src/machine-id-setup')
 subdir('src/manifest')
 subdir('src/measure')
 subdir('src/modules-load')
 subdir('src/mount')
-subdir('src/mountfsd')
 subdir('src/mstack')
 subdir('src/mute-console')
-subdir('src/network')
 subdir('src/notify')
 subdir('src/nspawn')
-subdir('src/nsresourced')
 subdir('src/nss-myhostname')
-subdir('src/nss-mymachines')
-subdir('src/nss-resolve')
 subdir('src/nss-systemd')
 subdir('src/oom')
 subdir('src/path')
 subdir('src/pcrextend')
 subdir('src/pcrlock')
-subdir('src/portable')
-subdir('src/pstore')
 subdir('src/ptybroker')
 subdir('src/ptyfwd')
 subdir('src/quotacheck')
 subdir('src/random-seed')
 subdir('src/remount-fs')
-subdir('src/repart')
-subdir('src/report')
 subdir('src/reply-password')
-subdir('src/resolve')
 subdir('src/rfkill')
 subdir('src/rpm')
 subdir('src/run')
@@ -2482,14 +2316,11 @@ subdir('src/socket-proxy')
 subdir('src/ssh-generator')
 subdir('src/stdio-bridge')
 subdir('src/storage')
-subdir('src/storagetm')
 subdir('src/sulogin-shell')
 subdir('src/sysctl')
-subdir('src/sysext')
 subdir('src/sysinstall')
 subdir('src/system-update-generator')
 subdir('src/systemctl')
-subdir('src/sysupdate')
 subdir('src/sysusers')
 subdir('src/timedate')
 subdir('src/timesync')
@@ -2500,13 +2331,11 @@ subdir('src/update-done')
 subdir('src/update-helper')
 subdir('src/update-utmp')
 subdir('src/user-sessions')
-subdir('src/userdb')
 subdir('src/validatefs')
 subdir('src/varlinkctl')
 subdir('src/varlink-monitor')
 subdir('src/vconsole')
 subdir('src/veritysetup')
-subdir('src/vmspawn')
 subdir('src/volatile-root')
 subdir('src/vpick')
 subdir('src/xdg-autostart-generator')
@@ -3444,13 +3273,7 @@ summary({
         'fallback hostname'                         : get_option('fallback-hostname'),
         'fallback default target'                   : fallback_default_target,
         'default compression method'                : compression,
-        'default DNSSEC mode'                       : default_dnssec,
-        'default DNS-over-TLS mode'                 : default_dns_over_tls,
-        'default mDNS mode'                         : default_mdns,
-        'default LLMNR mode'                        : default_llmnr,
-        'default DNS servers'                       : dns_servers.split(' '),
         'default NTP servers'                       : ntp_servers.split(' '),
-        'default GeoIP endpoint'                    : geoip_endpoint,
         'default net.naming_scheme= value'          : default_net_naming_scheme,
         'default KillUserProcesses= value'          : kill_user_processes,
         'default locale'                            : default_locale,
@@ -3461,7 +3284,6 @@ summary({
         'systemd service watchdog'                  : service_watchdog == '' ? 'disabled' : service_watchdog,
         'time epoch'                                : f'@time_epoch@ (@alt_time_epoch@)',
         'TPM2 nvpcr base'                           : run_command(sh, '-c', 'printf 0x%x @0@'.format(get_option('tpm2-nvpcr-base')), check : true).stdout(),
-        'IMDS networking'                           : get_option('imds-network'),
 })
 
 # TODO:
@@ -3605,11 +3427,9 @@ foreach tuple : [
         ['install tests',          install_tests],
         ['link-udev-shared',       get_option('link-udev-shared')],
         ['link-systemctl-shared',  get_option('link-systemctl-shared')],
-        ['link-networkd-shared',   get_option('link-networkd-shared')],
         ['link-timesyncd-shared',  get_option('link-timesyncd-shared')],
         ['link-journalctl-shared', get_option('link-journalctl-shared')],
         ['link-boot-shared',       get_option('link-boot-shared')],
-        ['link-portabled-shared',  get_option('link-portabled-shared')],
         ['first-boot-full-preset'],
         ['fexecve'],
         ['coverage',               get_option('b_coverage')],

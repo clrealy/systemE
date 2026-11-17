@@ -25,16 +25,12 @@ option('link-executor-shared', type : 'boolean',
        description : 'link (separate) systemd-executor to libsystemd-shared.so and libsystemd-core.so')
 option('link-systemctl-shared', type: 'boolean',
        description : 'link systemctl against libsystemd-shared.so')
-option('link-networkd-shared', type: 'boolean',
-       description : 'link systemd-networkd and its helpers to libsystemd-shared.so')
 option('link-timesyncd-shared', type: 'boolean',
        description : 'link systemd-timesyncd and its helpers to libsystemd-shared.so')
 option('link-journalctl-shared', type: 'boolean',
        description : 'link journalctl against libsystemd-shared.so')
 option('link-boot-shared', type: 'boolean',
        description : 'link bootctl and systemd-bless-boot against libsystemd-shared.so')
-option('link-portabled-shared', type: 'boolean',
-       description : 'link systemd-portabled and its helpers to libsystemd-shared.so')
 option('pack-relative-relocs', type: 'boolean', value: false,
        description : 'use pack-relative-relocs link flag (this is incompatible with glibc < 2.36)')
 option('standalone-binaries', type : 'string',
@@ -92,8 +88,6 @@ option('default-kill-user-processes', type : 'boolean',
        description : 'the default value for KillUserProcesses= setting')
 option('default-locale', type : 'string', value : 'C.UTF-8',
        description : 'default locale used when /etc/locale.conf does not exist')
-option('default-mountfsd-trusted-directories', type : 'boolean', value: false,
-       description : 'controls whether mountfsd should apply a relaxed policy on DDIs in system DDI directories')
 option('default-net-naming-scheme', type : 'string', value : 'latest',
        description : 'default net.naming_scheme= value')
 option('default-oci-registry', type : 'string', value : 'docker.io',
@@ -174,8 +168,6 @@ option('coredump', type : 'boolean',
        description : 'install the coredump handler')
 option('create-log-dirs', type : 'boolean',
        description : 'create /var/log/journal{,/remote}')
-option('default-network', type : 'boolean', value : false,
-       description : 'install default .network files')
 option('efi', type : 'boolean',
        description : 'enable EFI support')
 option('environment-d', type : 'boolean',
@@ -186,18 +178,10 @@ option('growfs', type : 'feature',
        description : 'install systemd-growfs, systemd-makefs, and associated files')
 option('hibernate', type : 'boolean',
        description : 'support for hibernation (requires sleep support)')
-option('homed', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
-       description : 'install the systemd-homed stack')
 option('hostnamed', type : 'boolean',
        description : 'install the systemd-hostnamed stack')
 option('hwdb', type : 'boolean',
        description : 'support for the hardware database')
-option('imds', type : 'feature',
-       description : 'install the systemd-imds stack')
-option('imds-network', type : 'combo', choices : ['unlocked', 'locked'],
-       description : 'whether to default to locked/unlocked IMDS network mode')
-option('importd', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
-       description : 'install the systemd-importd daemon')
 option('install-sysconfdir', type : 'combo', choices : ['true', 'no-samples', 'false'], value : 'true',
        description : 'install configuration files and directories')
 option('integritysetup', type : 'feature',
@@ -210,63 +194,30 @@ option('localed', type : 'boolean',
        description : 'install the systemd-localed stack')
 option('logind', type : 'boolean',
        description : 'install the systemd-logind stack')
-option('machined', type : 'boolean',
-       description : 'install the systemd-machined stack')
 option('measure', type : 'feature',
        description : 'install the systemd-measure tool')
 option('mime', type : 'feature',
        description : 'install MIME type definitions')
-option('mountfsd', type : 'boolean',
-       description : 'install the systemd-mountfsd stack')
-option('networkd', type : 'boolean',
-       description : 'install the systemd-networkd stack')
 option('nspawn', type : 'feature',
        description : 'build and install systemd-nspawn')
-option('nsresourced', type : 'boolean',
-       description : 'install the systemd-nsresourced stack')
 option('nss-myhostname', type : 'boolean',
        description : 'install nss-myhostname module')
-option('nss-mymachines', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
-       description : 'install nss-mymachines module')
-option('nss-resolve', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
-       description : 'install nss-resolve module')
 option('nss-systemd', type : 'boolean',
        description : 'install nss-systemd module')
 option('oomd', type : 'boolean',
        description : 'install the userspace oom killer')
-option('portabled', type : 'boolean',
-       description : 'install the systemd-portabled stack')
-option('pstore', type : 'boolean',
-       description : 'install the pstore archival tool')
 option('quotacheck', type : 'boolean',
        description : 'support for the quotacheck tools')
 option('randomseed', type : 'boolean',
        description : 'install systemd-random-seed.service')
-option('remote', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
-       description : 'support for "journal over the network"')
-option('repart', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
-       description : 'install the systemd-repart tool')
-option('report', type : 'feature',
-       description : 'install the systemd-report stack')
-option('resolve', type : 'boolean',
-       description : 'systemd-resolved stack')
 option('rfkill', type : 'boolean',
        description : 'support for the rfkill tools')
 option('sleep', type : 'feature',
        description : 'install systemd-sleep and associated files')
 option('storage', type : 'feature',
        description : 'install systemd-storage-block, systemd-storage-fs, storagectl, and associated files')
-option('storagetm', type : 'boolean',
-       description : 'support for Storage Target Mode')
-option('sysext', type : 'boolean',
-       description : 'install the systemd-sysext stack')
 option('sysinstall', type : 'boolean',
        description : 'install the systemd-sysinstall tool')
-option('sysupdate', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
-       description : 'install the systemd-sysupdate tool')
-option('sysupdated', type: 'combo', value : 'auto',
-       choices : ['auto', 'enabled', 'disabled'],
-       description : 'install the systemd-sysupdated service')
 option('sysusers', type : 'boolean',
        description : 'support for the sysusers configuration')
 option('timedated', type : 'boolean',
@@ -277,8 +228,6 @@ option('tpm', type : 'boolean',
        description : 'TPM should be used to log events and extend the registers')
 option('tmpfiles', type : 'boolean',
        description : 'support for tmpfiles.d')
-option('userdb', type : 'boolean',
-       description : 'install the systemd-userdbd stack')
 option('ukify', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
        description : 'install ukify')
 option('utmp', type : 'boolean',
@@ -293,8 +242,6 @@ option('vconsole', type : 'boolean',
        description : 'support for vconsole configuration')
 option('veritysetup', type : 'feature',
        description : 'install systemd-veritysetup and associated files')
-option('vmspawn', type : 'feature', deprecated : { 'true' : 'enabled', 'false' : 'disabled' },
-       description : 'install the systemd-vmspawn tool')
 option('xdg-autostart', type : 'boolean',
        description : 'install the xdg-autostart-generator and unit')
 
@@ -440,28 +387,6 @@ option('var-log-mode', type : 'combo',
        value : '0755')
 
 # DNS/DNSSEC
-option('default-dnssec', type : 'combo',
-       description : 'default DNSSEC mode',
-       choices : ['yes', 'allow-downgrade', 'no'],
-       value : 'allow-downgrade')
-option('default-dns-over-tls', type : 'combo',
-       description : 'default DNS-over-TLS mode',
-       choices : ['yes', 'opportunistic', 'no'],
-       value : 'no')
-option('default-mdns', type : 'combo',
-       choices : ['yes', 'resolve', 'no'],
-       description : 'default MulticastDNS mode',
-       value : 'yes')
-option('default-llmnr', type : 'combo',
-       choices : ['yes', 'resolve', 'no'],
-       description : 'default LLMNR mode',
-       value : 'yes')
-option('dns-over-tls', type : 'combo', choices : ['auto', 'gnutls', 'openssl', 'true', 'false'],
-       deprecated : { 'gnutls' : 'auto' },
-       description : 'DNS-over-TLS support')
-option('dns-servers', type : 'string',
-       description : 'space-separated list of default DNS servers',
-       value : '1.1.1.1#one.one.one.one 8.8.8.8#dns.google 9.9.9.9#dns.quad9.net 1.0.0.1#one.one.one.one 8.8.4.4#dns.google 149.112.112.112#dns.quad9.net 2606:4700:4700::1111#one.one.one.one 2001:4860:4860::8888#dns.google 2620:fe::fe#dns.quad9.net 2606:4700:4700::1001#one.one.one.one 2001:4860:4860::8844#dns.google 2620:fe::9#dns.quad9.net')
 option('ntp-servers', type : 'string',
        description : 'space-separated list of default NTP servers',
        value : 'time1.google.com time2.google.com time3.google.com time4.google.com')
@@ -625,7 +550,3 @@ option('oss-fuzz', type : 'boolean', value : false,
        description : 'build against oss-fuzz')
 option('llvm-fuzz', type : 'boolean', value : false,
        description : 'build against LLVM libFuzzer')
-
-option('geoip-endpoint', type : 'string',
-       description : 'default URL of the IP geolocation web service queried by systemd-report-geoip',
-       value : 'https://reallyfreegeoip.org/json/')

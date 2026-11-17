@@ -84,7 +84,7 @@ units = [
         },
         {
           'file' : 'initrd-parse-etc.service.in',
-          'conditions' : ['ENABLE_INITRD'],
+          'conditions' : ['ENABLE_INITRD', 'HAVE_LIBMOUNT'],
         },
         {
           'file' : 'initrd-root-device.target',
@@ -137,14 +137,6 @@ units = [
         },
         { 'file' : 'local-fs-pre.target' },
         { 'file' : 'local-fs.target' },
-        {
-          'file' : 'machine.slice',
-          'conditions' : ['ENABLE_MACHINED'],
-        },
-        {
-          'file' : 'machines.target',
-          'conditions' : ['ENABLE_MACHINED'],
-        },
         { 'file' : 'modprobe@.service' },
         {
           'file' : 'multi-user.target',
@@ -320,27 +312,6 @@ units = [
           'symlinks' : ['sockets.target.wants/'],
         },
         {
-          'file' : 'systemd-sysupdate-notify-bootctl@.service',
-          'conditions' : ['ENABLE_BOOTLOADER'],
-        },
-        {
-          'file' : 'systemd-sysupdate-notify-bootctl.socket',
-          'conditions' : ['ENABLE_BOOTLOADER'],
-        },
-        {
-          'file' : 'systemd-confext.service',
-          'conditions' : ['ENABLE_SYSEXT'],
-        },
-        {
-          'file' : 'systemd-confext-initrd.service',
-          'conditions' : ['ENABLE_INITRD', 'ENABLE_SYSEXT'],
-          'symlinks' : ['initrd.target.wants/'],
-        },
-        {
-          'file' : 'systemd-confext-sysroot.service',
-          'conditions' : ['ENABLE_INITRD', 'ENABLE_SYSEXT'],
-        },
-        {
           'file' : 'systemd-coredump.socket',
           'conditions' : ['ENABLE_COREDUMP'],
           'symlinks' : ['sockets.target.wants/', 'system-update-pre.target.wants/'],
@@ -431,18 +402,6 @@ units = [
           'conditions' : ['ENABLE_HIBERNATE'],
         },
         {
-          'file' : 'systemd-homed-activate.service',
-          'conditions' : ['ENABLE_HOMED'],
-        },
-        {
-          'file' : 'systemd-homed-firstboot.service',
-          'conditions' : ['ENABLE_HOMED'],
-        },
-        {
-          'file' : 'systemd-homed.service.in',
-          'conditions' : ['ENABLE_HOMED'],
-        },
-        {
           'file' : 'systemd-hostnamed.service.in',
           'conditions' : ['ENABLE_HOSTNAMED'],
           'symlinks' : ['dbus-org.freedesktop.hostname1.service'],
@@ -463,75 +422,12 @@ units = [
           'conditions' : ['ENABLE_HIBERNATE'],
         },
         {
-          'file' : 'systemd-imdsd@.service.in',
-          'conditions' : ['ENABLE_IMDS'],
-        },
-        {
-          'file' : 'systemd-imdsd.socket',
-          'conditions' : ['ENABLE_IMDS'],
-        },
-        {
-          'file' : 'systemd-imds-early-network.service.in',
-          'conditions' : ['ENABLE_IMDS'],
-        },
-        {
-          'file' : 'systemd-imds-import.service.in',
-          'conditions' : ['ENABLE_IMDS'],
-        },
-        {
-          'file' : 'systemd-imds-metrics.socket',
-          'conditions' : ['ENABLE_IMDS'],
-        },
-        {
-          'file' : 'systemd-imds-metrics@.service.in',
-          'conditions' : ['ENABLE_IMDS'],
-        },
-        {
-          'file' : 'systemd-importd.service.in',
-          'conditions' : ['ENABLE_IMPORTD'],
-          'symlinks' : ['dbus-org.freedesktop.import1.service'],
-        },
-        {
-          'file' : 'systemd-importd.socket',
-          'conditions' : ['ENABLE_IMPORTD'],
-          'symlinks' : ['sockets.target.wants/'],
-        },
-        {
-          'file' : 'imports-pre.target',
-          'conditions' : ['ENABLE_IMPORTD'],
-        },
-        {
-          'file' : 'imports.target',
-          'conditions' : ['ENABLE_IMPORTD'],
-          'symlinks' : ['sysinit.target.wants/'],
-        },
-        {
           'file' : 'systemd-journal-catalog-update.service',
           'symlinks' : ['sysinit.target.wants/'],
         },
         {
           'file' : 'systemd-journal-flush.service',
           'symlinks' : ['sysinit.target.wants/'],
-        },
-        {
-          'file' : 'systemd-journal-gatewayd.service.in',
-          'conditions' : ['ENABLE_REMOTE', 'HAVE_MICROHTTPD'],
-        },
-        {
-          'file' : 'systemd-journal-gatewayd.socket',
-          'conditions' : ['ENABLE_REMOTE', 'HAVE_MICROHTTPD'],
-        },
-        {
-          'file' : 'systemd-journal-remote.service.in',
-          'conditions' : ['ENABLE_REMOTE', 'HAVE_MICROHTTPD'],
-        },
-        {
-          'file' : 'systemd-journal-remote.socket',
-          'conditions' : ['ENABLE_REMOTE', 'HAVE_MICROHTTPD'],
-        },
-        {
-          'file' : 'systemd-journal-upload.service.in',
-          'conditions' : ['ENABLE_REMOTE', 'HAVE_LIBCURL'],
         },
         { 'file' : 'systemd-journalctl@.service' },
         {
@@ -583,7 +479,10 @@ units = [
           'conditions' : ['ENABLE_LOGIND'],
           'symlinks' : ['multi-user.target.wants/', 'dbus-org.freedesktop.login1.service'],
         },
-        { 'file' : 'systemd-loop@.service' },
+        {
+          'file' : 'systemd-loop@.service',
+          'conditions' : ['HAVE_BLKID'],
+        },
         {
           'file' : 'systemd-machine-id-commit.service',
           'symlinks' : ['sysinit.target.wants/'],
@@ -598,60 +497,13 @@ units = [
           'symlinks' : ['sysinit.target.wants/'],
         },
         {
-          'file' : 'systemd-machined.service.in',
-          'conditions' : ['ENABLE_MACHINED'],
-          'symlinks' : ['dbus-org.freedesktop.machine1.service'],
-        },
-        {
-          'file' : 'systemd-machined.socket',
-          'conditions' : ['ENABLE_MACHINED'],
-          'symlinks' : ['sockets.target.wants/'],
-        },
-        {
           'file' : 'systemd-modules-load.service.in',
           'conditions' : ['HAVE_KMOD'],
           'symlinks' : ['sysinit.target.wants/'],
         },
-        { 'file' : 'systemd-network-generator.service.in' },
-        {
-          'file' : 'systemd-networkd-persistent-storage.service',
-          'conditions' : ['ENABLE_NETWORKD'],
-        },
-        {
-          'file' : 'systemd-networkd-resolve-hook.socket',
-          'conditions' : ['ENABLE_NETWORKD'],
-        },
-        {
-          'file' : 'systemd-networkd-varlink.socket',
-          'conditions' : ['ENABLE_NETWORKD'],
-        },
-        {
-          'file' : 'systemd-networkd-varlink-metrics.socket',
-          'conditions' : ['ENABLE_NETWORKD'],
-        },
-        {
-          'file' : 'systemd-networkd-wait-online.service.in',
-          'conditions' : ['ENABLE_NETWORKD'],
-        },
-        {
-          'file' : 'systemd-networkd-wait-online@.service.in',
-          'conditions' : ['ENABLE_NETWORKD'],
-        },
-        {
-          'file' : 'systemd-networkd.service.in',
-          'conditions' : ['ENABLE_NETWORKD'],
-        },
-        {
-          'file' : 'systemd-networkd.socket',
-          'conditions' : ['ENABLE_NETWORKD'],
-        },
         {
           'file' : 'systemd-nspawn@.service.in',
           'conditions' : ['ENABLE_NSPAWN'],
-        },
-        {
-          'file' : 'systemd-vmspawn@.service.in',
-          'conditions' : ['ENABLE_VMSPAWN'],
         },
         {
           'file' : 'systemd-oomd.service.in',
@@ -728,22 +580,6 @@ units = [
           'symlinks' : ['sysinit.target.wants/'],
         },
         {
-          'file' : 'systemd-report.socket',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report@.service.in',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-basic.socket',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-basic@.service.in',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
           'file' : 'systemd-tpm2-clear.service.in',
           'conditions' : ['ENABLE_BOOTLOADER', 'HAVE_OPENSSL', 'HAVE_TPM2'],
         },
@@ -798,24 +634,7 @@ units = [
           'conditions' : ['ENABLE_BOOTLOADER', 'HAVE_OPENSSL', 'HAVE_TPM2'],
           'symlinks' : ['sockets.target.wants/'],
         },
-        {
-          'file' : 'systemd-sysupdate-notify-pcrlock@.service.in',
-          'conditions' : ['ENABLE_BOOTLOADER', 'HAVE_OPENSSL', 'HAVE_TPM2'],
-        },
-        {
-          'file' : 'systemd-sysupdate-notify-pcrlock.socket',
-          'conditions' : ['ENABLE_BOOTLOADER', 'HAVE_OPENSSL', 'HAVE_TPM2'],
-        },
-        {
-          'file' : 'systemd-portabled.service.in',
-          'conditions' : ['ENABLE_PORTABLED'],
-          'symlinks' : ['dbus-org.freedesktop.portable1.service'],
-        },
         { 'file' : 'systemd-poweroff.service' },
-        {
-          'file' : 'systemd-pstore.service.in',
-          'conditions' : ['ENABLE_PSTORE'],
-        },
         { 'file' : 'systemd-ptybrokerd.service.in' },
         { 'file' : 'systemd-ptybrokerd.socket' },
         {
@@ -832,112 +651,9 @@ units = [
           'symlinks' : ['sysinit.target.wants/'],
         },
         { 'file' : 'systemd-reboot.service' },
-        { 'file' : 'systemd-remount-fs.service.in' },
         {
-          'file' : 'systemd-repart.service',
-          'conditions' : ['ENABLE_REPART'],
-          'symlinks' : ['sysinit.target.wants/', 'initrd-root-fs.target.wants/'],
-        },
-        {
-          'file' : 'systemd-repart.socket',
-          'conditions' : ['ENABLE_REPART'],
-          'symlinks' : ['sockets.target.wants/'],
-        },
-        {
-          'file' : 'systemd-repart@.service',
-          'conditions' : ['ENABLE_REPART'],
-        },
-        {
-          'file' : 'systemd-report-cgroup.socket',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-cgroup@.service.in',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-diskhealth.socket',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-diskhealth@.service.in',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-diskspace.socket',
-          'conditions' : ['ENABLE_REPORT', 'HAVE_LIBMOUNT'],
-        },
-        {
-          'file' : 'systemd-report-diskspace@.service.in',
-          'conditions' : ['ENABLE_REPORT', 'HAVE_LIBMOUNT'],
-        },
-        {
-          'file' : 'systemd-report-files.socket',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-files@.service.in',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-geoip.socket',
-          'conditions' : ['ENABLE_REPORT', 'HAVE_LIBCURL'],
-        },
-        {
-          'file' : 'systemd-report-geoip@.service.in',
-          'conditions' : ['ENABLE_REPORT', 'HAVE_LIBCURL'],
-        },
-        {
-          'file' : 'systemd-report-hwmon.socket',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-hwmon@.service.in',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-netstat.socket',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-netstat@.service.in',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-sign-plain.socket',
-          'conditions' : ['ENABLE_REPORT', 'HAVE_OPENSSL'],
-        },
-        {
-          'file' : 'systemd-report-sign-plain@.service.in',
-          'conditions' : ['ENABLE_REPORT', 'HAVE_OPENSSL'],
-        },
-        {
-          'file' : 'systemd-report-sign-tpm2.socket',
-          'conditions' : ['ENABLE_REPORT', 'HAVE_OPENSSL', 'HAVE_TPM2'],
-        },
-        {
-          'file' : 'systemd-report-sign-tpm2@.service.in',
-          'conditions' : ['ENABLE_REPORT', 'HAVE_OPENSSL', 'HAVE_TPM2'],
-        },
-        {
-          'file' : 'systemd-report-sign-tsm.socket',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-report-sign-tsm@.service.in',
-          'conditions' : ['ENABLE_REPORT'],
-        },
-        {
-          'file' : 'systemd-resolved.service.in',
-          'conditions' : ['ENABLE_RESOLVE'],
-        },
-        {
-          'file' : 'systemd-resolved-varlink.socket',
-          'conditions' : ['ENABLE_RESOLVE'],
-        },
-        {
-          'file' : 'systemd-resolved-monitor.socket',
-          'conditions' : ['ENABLE_RESOLVE'],
+          'file' : 'systemd-remount-fs.service.in',
+          'conditions' : ['HAVE_LIBMOUNT'],
         },
         {
           'file' : 'systemd-rfkill.service.in',
@@ -961,36 +677,6 @@ units = [
           'symlinks' : ['sysinit.target.wants/'],
         },
         {
-          'file' : 'systemd-sysext.service',
-          'conditions' : ['ENABLE_SYSEXT'],
-        },
-        {
-          'file' : 'systemd-sysext-initrd.service',
-          'conditions' : ['ENABLE_INITRD', 'ENABLE_SYSEXT'],
-          'symlinks' : ['initrd.target.wants/'],
-        },
-        {
-          'file' : 'systemd-sysext-sysroot.service',
-          'conditions' : ['ENABLE_INITRD', 'ENABLE_SYSEXT'],
-        },
-        {
-          'file' : 'systemd-sysext.socket',
-          'conditions' : ['ENABLE_SYSEXT'],
-          'symlinks' : ['sockets.target.wants/'],
-        },
-        {
-          'file' : 'systemd-sysupdate-notify-sysext@.service',
-          'conditions' : ['ENABLE_SYSEXT'],
-        },
-        {
-          'file' : 'systemd-sysupdate-notify-sysext.socket',
-          'conditions' : ['ENABLE_SYSEXT'],
-        },
-        {
-          'file' : 'systemd-sysext@.service',
-          'conditions' : ['ENABLE_SYSEXT'],
-        },
-        {
           'file' : 'systemd-sysinstall.service',
           'conditions' : ['ENABLE_SYSINSTALL'],
           'symlinks' : ['system-install.target.wants/'],
@@ -1003,42 +689,6 @@ units = [
         {
           'file' : 'systemd-sysinstall@.service',
           'conditions' : ['ENABLE_SYSINSTALL'],
-        },
-        {
-          'file' : 'systemd-sysupdate-auto-enable.service.in',
-          'conditions' : ['ENABLE_SYSUPDATE'],
-        },
-        {
-          'file' : 'systemd-sysupdate-reboot.service.in',
-          'conditions' : ['ENABLE_SYSUPDATE'],
-        },
-        {
-          'file' : 'systemd-sysupdate-reboot.timer',
-          'conditions' : ['ENABLE_SYSUPDATE'],
-        },
-        {
-          'file' : 'systemd-sysupdate-update.service.in',
-          'conditions' : ['ENABLE_SYSUPDATE'],
-          'symlinks' : ['systemd-sysupdate.service'],  # compatibility after rename
-        },
-        {
-          'file' : 'systemd-sysupdate@.service.in',
-          'conditions' : ['ENABLE_SYSUPDATE'],
-        },
-        {
-          'file' : 'systemd-sysupdate.socket',
-          'conditions' : ['ENABLE_SYSUPDATE'],
-          'symlinks' : ['sockets.target.wants/'],
-        },
-        {
-          'file' : 'systemd-sysupdate-update.timer',
-          'conditions' : ['ENABLE_SYSUPDATE'],
-          'symlinks' : ['systemd-sysupdate.timer'],  # compatibility after rename
-        },
-        {
-          'file' : 'systemd-sysupdated.service.in',
-          'conditions' : ['ENABLE_SYSUPDATED'],
-          'symlinks' : ['dbus-org.freedesktop.sysupdate1.service'],
         },
         {
           'file' : 'systemd-sysusers.service',
@@ -1062,14 +712,6 @@ units = [
         {
           'file' : 'systemd-storage-fs@.service.in',
           'conditions' : ['ENABLE_STORAGE'],
-        },
-        {
-          'file' : 'systemd-storagetm.service.in',
-          'conditions' : ['ENABLE_STORAGETM'],
-        },
-        {
-          'file' : 'storage-target-mode.target',
-          'conditions' : ['ENABLE_STORAGETM'],
         },
         {
           'file' : 'systemd-time-wait-sync.service.in',
@@ -1156,34 +798,6 @@ units = [
           'symlinks' : ['multi-user.target.wants/'],
         },
         {
-          'file' : 'systemd-userdb-load-credentials.service',
-          'conditions' : ['ENABLE_USERDB'],
-        },
-        {
-          'file' : 'systemd-userdbd.service.in',
-          'conditions' : ['ENABLE_USERDB'],
-        },
-        {
-          'file' : 'systemd-userdbd.socket',
-          'conditions' : ['ENABLE_USERDB'],
-        },
-        {
-          'file' : 'systemd-mountfsd.service.in',
-          'conditions' : ['ENABLE_MOUNTFSD'],
-        },
-        {
-          'file' : 'systemd-mountfsd.socket',
-          'conditions' : ['ENABLE_MOUNTFSD'],
-        },
-        {
-          'file' : 'systemd-nsresourced.service.in',
-          'conditions' : ['ENABLE_NSRESOURCED'],
-        },
-        {
-          'file' : 'systemd-nsresourced.socket.in',
-          'conditions' : ['ENABLE_NSRESOURCED'],
-        },
-        {
           'file' : 'systemd-validatefs@.service.in',
           'conditions' : ['ENABLE_VALIDATEFS'],
         },
@@ -1217,11 +831,6 @@ units = [
         { 'file' : 'user-runtime-dir@.service.in' },
         { 'file' : 'user.slice' },
         { 'file' : 'user@.service.in' },
-        {
-          'file' : 'var-lib-machines.mount',
-          'conditions' : ['ENABLE_MACHINED'],
-          'symlinks' : ['remote-fs.target.wants/', 'machines.target.wants/'],
-        },
         {
           'file' : 'varlink-sftp-root.service.in',
           'conditions' : ['ENABLE_VARLINK_SFTP'],

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b1726"/>
+      <stop offset="1" stop-color="#0e0c14"/>
+    </linearGradient>
+    <linearGradient id="rust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff8a3d"/>
+      <stop offset="1" stop-color="#d9480f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1200" rx="220" fill="url(#bg)"/>
+
+  <!-- gear ring: 8 teeth around a ring = the init that turns everything -->
+  <g transform="translate(600 640)" fill="url(#rust)">
+    <g id="tooth"><rect x="-46" y="-330" width="92" height="96" rx="18"/></g>
+    <use href="#tooth" transform="rotate(45)"/>
+    <use href="#tooth" transform="rotate(90)"/>
+    <use href="#tooth" transform="rotate(135)"/>
+    <use href="#tooth" transform="rotate(180)"/>
+    <use href="#tooth" transform="rotate(225)"/>
+    <use href="#tooth" transform="rotate(270)"/>
+    <use href="#tooth" transform="rotate(315)"/>
+    <circle r="262"/>
+  </g>
+  <circle cx="600" cy="640" r="196" fill="#15121d"/>
+
+  <!-- big E inside the gear -->
+  <g fill="#f5f0e8">
+    <rect x="510" y="535" width="64" height="210" rx="10"/>
+    <rect x="510" y="535" width="190" height="52" rx="10"/>
+    <rect x="510" y="614" width="160" height="52" rx="10"/>
+    <rect x="510" y="693" width="190" height="52" rx="10"/>
+  </g>
+
+
+  <!-- tiny beret on the gear -->
+  <g transform="translate(600 300) rotate(-12)">
+    <ellipse cx="0" cy="0" rx="190" ry="62" fill="#111"/>
+    <ellipse cx="-10" cy="-18" rx="150" ry="44" fill="#1d1d1d"/>
+    <rect x="-8" y="-82" width="16" height="34" rx="8" fill="#111"/>
+  </g>
+</svg>
