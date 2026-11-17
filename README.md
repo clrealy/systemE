@@ -1,7 +1,7 @@
 > [!IMPORTANT]
 > Remove this line to confirm you've reviewed this PR before submitting.
 
-![Systemd](http://brand.systemd.io/assets/page-logo.png)
+![systemE](docs/assets/brand/systemE-wordmark.png)
 
 System and Service Manager
 

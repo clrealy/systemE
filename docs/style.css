@@ -210,7 +210,7 @@ th:last-child, td:last-child {
   padding: 5rem 0 3rem;
   color: var(--sd-logo-color);
 }
-.page-logo > svg {
+.page-logo > img {
   display: block;
   width: 12.625em;
   height: auto;
