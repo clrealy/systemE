@@ -15,6 +15,16 @@
 
 set -eu
 
+# Suggest whichever privilege helper this machine actually has, rather than
+# naming one it may not install.
+if command -v sudo >/dev/null 2>&1; then
+        PRIV=sudo
+elif command -v doas >/dev/null 2>&1; then
+        PRIV=doas
+else
+        PRIV=
+fi
+
 BUILD=build
 DEST=dest
 SYSTEM=0
@@ -22,7 +32,26 @@ ASSUME_YES=0
 CONFIGURE_ARGS=""
 
 usage() {
-        sed -n '3,14p' "$0" | sed 's/^# \{0,1\}//'
+        # printf, not cat: --help should work whatever is on PATH.
+        printf '%s\n' \
+'Build and install systemE.' \
+'' \
+'By default this stages the install into ./dest so you can look at what you are' \
+'about to put on a machine. Installing over a running system replaces PID 1, the' \
+'NSS and PAM modules and libsystemd, so it is deliberately not the default: pass' \
+'--system for that, as root.' \
+''
+        # printf rather than fixed padding: the --system example is longer when
+        # this machine has sudo or doas, and the columns should still line up.
+        printf '  %-33s %s\n' \
+                './install.sh' 'build and stage into ./dest' \
+                './install.sh --dest DIR' 'stage somewhere else' \
+                "${PRIV:+$PRIV }./install.sh --system" 'install over this machine' \
+                './install.sh --help' 'show this' \
+                '-y, --yes' 'do not prompt before installing over a machine' \
+                '--build DIR' 'use this build directory instead of ./build' \
+                '--' 'pass the rest to meson setup, e.g.' \
+                '' './install.sh -- -Dopenssl=enabled'
         exit "${1:-0}"
 }
 
@@ -41,7 +70,12 @@ done
 # Check this before building: finding out you needed root after a five minute
 # build, by way of a traceback from meson, is no way to learn it.
 if [ "$SYSTEM" -eq 1 ] && [ "$(id -u)" -ne 0 ]; then
-        printf 'install.sh: --system needs root. Try: doas %s --system\n' "$0" >&2
+        if [ -n "$PRIV" ]; then
+                printf 'install.sh: --system needs root. Try: %s %s --system\n' \
+                        "$PRIV" "$0" >&2
+        else
+                printf 'install.sh: --system needs root; run it as root.\n' >&2
+        fi
         exit 1
 fi
 
