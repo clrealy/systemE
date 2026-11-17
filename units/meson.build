@@ -84,7 +84,7 @@ units = [
         },
         {
           'file' : 'initrd-parse-etc.service.in',
-          'conditions' : ['ENABLE_INITRD'],
+          'conditions' : ['ENABLE_INITRD', 'HAVE_LIBMOUNT'],
         },
         {
           'file' : 'initrd-root-device.target',
@@ -479,7 +479,10 @@ units = [
           'conditions' : ['ENABLE_LOGIND'],
           'symlinks' : ['multi-user.target.wants/', 'dbus-org.freedesktop.login1.service'],
         },
-        { 'file' : 'systemd-loop@.service' },
+        {
+          'file' : 'systemd-loop@.service',
+          'conditions' : ['HAVE_BLKID'],
+        },
         {
           'file' : 'systemd-machine-id-commit.service',
           'symlinks' : ['sysinit.target.wants/'],
@@ -648,7 +651,10 @@ units = [
           'symlinks' : ['sysinit.target.wants/'],
         },
         { 'file' : 'systemd-reboot.service' },
-        { 'file' : 'systemd-remount-fs.service.in' },
+        {
+          'file' : 'systemd-remount-fs.service.in',
+          'conditions' : ['HAVE_LIBMOUNT'],
+        },
         {
           'file' : 'systemd-rfkill.service.in',
           'conditions' : ['ENABLE_RFKILL'],
