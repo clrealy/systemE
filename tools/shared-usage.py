@@ -58,11 +58,16 @@ def undefined_symbols(obj):
     if obj in _UNDEF_CACHE:
         return _UNDEF_CACHE[obj]
     syms = set()
+    # 'U' is an ordinary undefined reference, 'w' a weak one. Weak references matter here
+    # even though they do not force an archive member to be linked: src/basic/hashmap.c
+    # refers weakly to mempool_enabled, which only src/shared/enable-mempool.c defines, and
+    # linking that object is precisely how the memory pool gets switched on. Counting only
+    # 'U' made it look dead.
     for line in nm(obj, ['-u']):
         parts = line.split()
-        if parts and parts[0] == 'U' and len(parts) >= 2:
+        if parts and parts[0] in ('U', 'w') and len(parts) >= 2:
             syms.add(parts[1])
-        elif len(parts) >= 2 and parts[-2] == 'U':
+        elif len(parts) >= 2 and parts[-2] in ('U', 'w'):
             syms.add(parts[-1])
     _UNDEF_CACHE[obj] = syms
     return syms
