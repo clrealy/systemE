@@ -1,0 +1,58 @@
+---
+# vi: ts=2 sw=2 et:
+# SPDX-License-Identifier: LGPL-2.1-or-later
+#
+# systemE's premise is that a program should link what it uses and no more. Scope cuts do
+# not achieve that on their own: after removing a quarter of the tree every installed
+# program still linked the whole of libsystemd-shared. This gate exists so that the
+# measurement cannot quietly drift back up while the delamination work is in progress.
+#
+# The build is configured with --auto-features=disabled on purpose. What a program links
+# otherwise depends on which optional libraries the runner happens to have, and the
+# baseline would not be comparable between machines.
+name: Dependency closure
+on:
+  pull_request:
+    paths:
+      - '**/meson.build'
+      - 'meson_options.txt'
+      - 'src/**'
+      - 'tools/closure-report.py'
+      - 'tools/closure-baseline.json'
+      - '.github/workflows/closure-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  closure:
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends install \
+            gcc gperf libcap-dev libmount-dev meson ninja-build \
+            pkg-config python3-jinja2
+          # binutils provides objcopy, which the report uses to read .note.dlopen
+          command -v objcopy
+
+      - name: Configure and build
+        run: |
+          meson setup build --auto-features=disabled
+          ninja -C build
+
+      - name: Check that no dependency closure grew
+        run: python3 tools/closure-report.py build --baseline tools/closure-baseline.json
+
+      - name: Report the current closures
+        if: always()
+        run: python3 tools/closure-report.py build --top 25
