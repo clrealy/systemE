@@ -2,9 +2,9 @@
 > Remove this line to confirm you've reviewed this PR before submitting.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/systemE-box-wordmark-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/assets/brand/systemE-box-wordmark-light.svg">
-  <img alt="systemE" src="docs/assets/brand/systemE-box-wordmark-dark.svg" width="600">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/systemE-box-wordmark-dark-blink.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/brand/systemE-box-wordmark-light-blink.svg">
+  <img alt="systemE" src="docs/assets/brand/systemE-box-wordmark-dark-blink.svg" width="600">
 </picture>
 
 System and Service Manager
