@@ -151,9 +151,21 @@ greps for `systemd` still match.
 - The clone was **shallow** (17 days of history, no tags) until Phase B. First action of any execution phase:
   `git remote add upstream https://github.com/systemd/systemd && git fetch --unshallow --tags upstream`.
   Without tags we can't even name our base release properly.
-- Version scheme: track upstream's major and append ours — `263.0E`, next `263.1E`, bumping the
-  major when we sync to 264. Keeps `meson.version` sortable and makes "which upstream are we on"
-  answerable by anyone.
+- Version scheme: `<upstream major>.<our serial>`, all digits — `263.1`, then `263.2`, and
+  `264.1` after a sync to 264. **The `263.0E` form first written here is wrong and was removed
+  after it was tested.** Two constraints fix the shape, and neither is a matter of taste:
+  - The **major must stay upstream's**. `PROJECT_VERSION` is what `ConditionVersion=systemd >= N`
+    in a unit file compares against (`src/shared/condition.c`). A systemE reporting `0` would make
+    every third-party unit carrying that condition silently fail to start. The version number is
+    part of the frozen interface surface, not a label.
+  - The **minor must be numeric**. It is passed to `tools/elf2efi.py --version-minor`, which is
+    `type=int`, so a suffixed version fails the build of `systemd-bootx64.efi`:
+    `invalid int value: '0E'`. Confirmed by building it both ways.
+
+  `263.1` yields `PROJECT_VERSION 263`, `PROJECT_VERSION_FULL "263.1"`, sorts above systemd's
+  own `263` so no packaging epoch is needed, and builds the EFI stub cleanly.
+- Release identity is separate from the version number: releases are named from the pastry list
+  in `docs/RELEASES.md`, so 0.1 "Baguette" is the release and `263.1` is what the binary reports.
 - Sync cadence: upstream ships **~4 majors a year** (v261→v262 was 94 days, 1,894 commits).
   Budget a sync sprint per major, plus cherry-picks for CVEs. At 9,345 commits/yr from 613
   authors, skipping two majors in a row is how forks die.
