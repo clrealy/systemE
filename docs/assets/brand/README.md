@@ -3,6 +3,30 @@
 Replaces the systemd logo, which systemE must not use: the fork is not endorsed by or
 affiliated with the systemd project. See `docs/FORK_STRATEGY.md` §3.
 
+## The box set
+
+The current marks. `-dark` sits on `#0e0c14`, `-light` on white, so a pair of them
+switches with the reader's theme.
+
+| file | what it is |
+|---|---|
+| `systemE-box-wordmark-dark.svg` / `-light.svg` | mark and name, 1507x500. The README banner |
+| `systemE-box-wordmark-*-blink.svg` | the same, with the box blinking like a cursor |
+| `systemE-box-dark.svg` / `-light.svg` | the box on its own, 1200x1200. For the GitHub avatar |
+| `systemE-box-*-blink.svg` | the same, blinking |
+| `*.png` | 1507x500 and 1200x1200 exports of the four static marks |
+
+The blink is SMIL: `<animate>` on opacity, a 1.06s cycle. It animates in a browser that
+renders the file directly. Whether it animates inside a README depends on how the host
+serves repository SVGs, so the static pair is what the banner uses.
+
+Setting the GitHub avatar is not something the repository can do: upload
+`systemE-box-dark.png` by hand under the account or organisation's profile settings.
+
+## The earlier gear set
+
+Kept because the docs site header still uses it, and it is the fuller lockup.
+
 | file | what it is |
 |---|---|
 | `systemE-logo.svg` / `.png` | the mark on its own, 1200x1200 |
