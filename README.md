@@ -36,6 +36,9 @@ Consult the [NEWS file](NEWS) for what changed in each systemd release this fork
 Please see the [Fork Roadmap](docs/ROADMAP.md) for the plan governing systemE, and the
 [Code Map](docs/ARCHITECTURE.md) for this repository's layout and content.
 
+Releases are named after French pastries; the list is in
+[Release Codenames](docs/RELEASES.md).
+
 Please see the [Hacking guide](docs/HACKING.md) for how to build systemE and test your
 modifications, and the [Contribution Guidelines](docs/CONTRIBUTING.md) for filing issues and
 posting pull requests.
