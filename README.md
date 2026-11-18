@@ -1,7 +1,11 @@
 > [!IMPORTANT]
 > Remove this line to confirm you've reviewed this PR before submitting.
 
-![systemE](docs/assets/brand/systemE-wordmark.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/systemE-box-wordmark-dark-blink.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/brand/systemE-box-wordmark-light-blink.svg">
+  <img alt="systemE" src="docs/assets/brand/systemE-box-wordmark-dark-blink.svg" width="600">
+</picture>
 
 System and Service Manager
 
