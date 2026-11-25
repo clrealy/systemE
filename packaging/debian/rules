@@ -4,7 +4,10 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 include /usr/share/dpkg/architecture.mk
 
 %:
-	dh $@ --buildsystem=meson
+	# --with dlopenlibdeps turns the .note.dlopen priorities the binaries
+	# carry into Depends, Recommends and Suggests. Without it the package
+	# would not declare libmount, which PID 1 cannot boot without.
+	dh $@ --buildsystem=meson --with dlopenlibdeps
 
 override_dh_auto_configure:
 	dh_auto_configure -- \

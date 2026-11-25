@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: systemE developers <packaging@systeme.invalid>
 Build-Depends:
  debhelper-compat (= 13),
+ dh-dlopenlibdeps,
  meson (>= 0.62),
  ninja-build,
  gperf,
@@ -54,8 +55,9 @@ Rules-Requires-Root: no
 Package: systeme
 Architecture: linux-any
 Multi-Arch: foreign
-Depends: ${shlibs:Depends}, ${misc:Depends}, libsysteme0 (= ${binary:Version}), dbus | dbus-system-bus
-Recommends: network-manager | ifupdown | connman
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${dlopen:Depends}, libsysteme0 (= ${binary:Version}), dbus | dbus-system-bus
+Recommends: ${dlopen:Recommends}, network-manager | ifupdown | connman
+Suggests: ${dlopen:Suggests}
 Provides:
  systemd (= ${binary:Version}),
  systemd-sysv (= ${binary:Version}),
@@ -98,7 +100,9 @@ Package: libsysteme0
 Architecture: linux-any
 Multi-Arch: same
 Section: libs
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${dlopen:Depends}
+Recommends: ${dlopen:Recommends}
+Suggests: ${dlopen:Suggests}
 Provides:
  libsystemd0 (= ${binary:Version}),
  libudev1 (= ${binary:Version}),
