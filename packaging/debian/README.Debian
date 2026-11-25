@@ -1,0 +1,26 @@
+systemE on Debian and Ubuntu
+============================
+
+systemE replaces systemd. Installing it removes the distribution's systemd,
+systemd-sysv, udev, libsystemd0, libudev1 and related packages, and provides
+the same names, so everything that depends on them stays installed.
+
+Before you reboot
+-----------------
+
+systemE does not ship systemd-networkd or systemd-resolved. On Ubuntu Server,
+netplan normally renders to systemd-networkd, so a machine set up that way
+comes back with no network. Install and configure NetworkManager, ifupdown or
+connman first, and point /etc/resolv.conf at a resolver that exists.
+
+logind needs a system bus, which is why systeme depends on dbus.
+
+Going back
+----------
+
+    apt install systemd systemd-sysv udev libsystemd0 libudev1
+
+apt removes systeme in the same transaction, the same way it was put in.
+
+If the machine does not boot, add init=/bin/sh to the kernel command line from
+the boot loader to get a shell.

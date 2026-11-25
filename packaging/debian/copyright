@@ -1,0 +1,448 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: systemE
+Upstream-Contact: https://github.com/clrealy/systemE/issues
+Source: https://github.com/clrealy/systemE
+Comment:
+ systemE is a fork of systemd. Generated from the SPDX-License-Identifier
+ line in each source file, which is authoritative; regenerate rather than
+ edit by hand. Licence expressions are given in SPDX syntax.
+
+Files: *
+Copyright: systemd contributors
+           systemE contributors
+License: LGPL-2.1-or-later
+
+Files:
+  src/include/uapi/linux/if_infiniband.h
+Copyright: the respective authors; see each file
+License: ((GPL-2.0-only WITH Linux-syscall-note) OR BSD-2-Clause)
+
+Files:
+  src/include/uapi/linux/ethtool_netlink_generated.h
+  src/include/uapi/linux/fou.h
+  src/include/uapi/linux/wireguard.h
+Copyright: the respective authors; see each file
+License: ((GPL-2.0-only WITH Linux-syscall-note) OR BSD-3-Clause)
+
+Files:
+  src/include/uapi/linux/v4l2-common.h
+  src/include/uapi/linux/v4l2-controls.h
+  src/include/uapi/linux/videodev2.h
+Copyright: the respective authors; see each file
+License: ((GPL-2.0-or-later WITH Linux-syscall-note) OR BSD-3-Clause)
+
+Files:
+  src/include/uapi/linux/bpf_insn.h
+Copyright: the respective authors; see each file
+License: (GPL-2.0-only OR BSD-2-Clause)
+
+Files:
+  src/include/uapi/linux/io_uring.h
+  src/include/uapi/linux/io_uring/*
+Copyright: the respective authors; see each file
+License: (GPL-2.0-only WITH Linux-syscall-note) OR MIT
+
+Files:
+  src/boot/chid.c
+  src/boot/chid.h
+  src/fundamental/chid.c
+  src/fundamental/chid.h
+  tools/chromiumos/*
+Copyright: the respective authors; see each file
+License: BSD-3-Clause
+
+Files:
+  src/basic/siphash24.c
+  src/basic/siphash24.h
+Copyright: the respective authors; see each file
+License: CC0-1.0
+
+Files:
+  src/include/uapi/linux/if_bonding.h
+  src/include/uapi/linux/loop.h
+Copyright: the respective authors; see each file
+License: GPL-1.0-or-later WITH Linux-syscall-note
+
+Files:
+  src/include/uapi/linux/bpf.h
+  src/include/uapi/linux/bpf_common.h
+  src/include/uapi/linux/btrfs.h
+  src/include/uapi/linux/btrfs_tree.h
+  src/include/uapi/linux/can/*
+  src/include/uapi/linux/capability.h
+  src/include/uapi/linux/const.h
+  src/include/uapi/linux/coredump.h
+  src/include/uapi/linux/ethtool.h
+  src/include/uapi/linux/fib_rules.h
+  src/include/uapi/linux/filter.h
+  src/include/uapi/linux/fs.h
+  src/include/uapi/linux/fscrypt.h
+  src/include/uapi/linux/fsverity.h
+  src/include/uapi/linux/genetlink.h
+  src/include/uapi/linux/hdlc/*
+  src/include/uapi/linux/hidraw.h
+  src/include/uapi/linux/if_addr.h
+  src/include/uapi/linux/if_addrlabel.h
+  src/include/uapi/linux/if_link.h
+  src/include/uapi/linux/if_packet.h
+  src/include/uapi/linux/if_tunnel.h
+  src/include/uapi/linux/input-event-codes.h
+  src/include/uapi/linux/input.h
+  src/include/uapi/linux/ioctl.h
+  src/include/uapi/linux/ioprio.h
+  src/include/uapi/linux/ip6_tunnel.h
+  src/include/uapi/linux/ipv6.h
+  src/include/uapi/linux/kexec.h
+  src/include/uapi/linux/l2tp.h
+  src/include/uapi/linux/libc-compat.h
+  src/include/uapi/linux/limits.h
+  src/include/uapi/linux/liveupdate.h
+  src/include/uapi/linux/magic.h
+  src/include/uapi/linux/mempolicy.h
+  src/include/uapi/linux/neighbour.h
+  src/include/uapi/linux/net_namespace.h
+  src/include/uapi/linux/netfilter.h
+  src/include/uapi/linux/netfilter/*
+  src/include/uapi/linux/netfilter_ipv4.h
+  src/include/uapi/linux/netfilter_ipv4/*
+  src/include/uapi/linux/netlink.h
+  src/include/uapi/linux/nexthop.h
+  src/include/uapi/linux/nsfs.h
+  src/include/uapi/linux/nvme_ioctl.h
+  src/include/uapi/linux/openat2.h
+  src/include/uapi/linux/pidfd.h
+  src/include/uapi/linux/pkt_sched.h
+  src/include/uapi/linux/prctl.h
+  src/include/uapi/linux/rtnetlink.h
+  src/include/uapi/linux/sched/*
+  src/include/uapi/linux/securebits.h
+  src/include/uapi/linux/socket.h
+  src/include/uapi/linux/stat.h
+  src/include/uapi/linux/stddef.h
+  src/include/uapi/linux/typelimits.h
+  src/include/uapi/linux/veth.h
+  src/include/uapi/linux/vm_sockets.h
+  src/include/uapi/linux/xattr.h
+Copyright: the respective authors; see each file
+License: GPL-2.0-only WITH Linux-syscall-note
+
+Files:
+  src/udev/ata_id/*
+  src/udev/cdrom_id/*
+  src/udev/dmi_memory_id/*
+  src/udev/mtd_probe/*
+  src/udev/scsi_id/*
+  src/udev/udev-builtin-blkid.c
+  src/udev/udev-builtin-dissect_image.c
+  src/udev/udev-builtin-factory_reset.c
+  src/udev/udev-builtin-input_id.c
+  src/udev/udev-builtin-kmod.c
+  src/udev/udev-builtin-path_id.c
+  src/udev/udev-builtin-tpm2_id.c
+  src/udev/udev-builtin-uaccess.c
+  src/udev/udev-builtin-usb_id.c
+  src/udev/udev-builtin.h
+  src/udev/udev-config.c
+  src/udev/udev-config.h
+  src/udev/udev-def.h
+  src/udev/udev-dump.c
+  src/udev/udev-dump.h
+  src/udev/udev-error.c
+  src/udev/udev-error.h
+  src/udev/udev-event.c
+  src/udev/udev-event.h
+  src/udev/udev-format.c
+  src/udev/udev-format.h
+  src/udev/udev-manager.c
+  src/udev/udev-manager.h
+  src/udev/udev-node.c
+  src/udev/udev-node.h
+  src/udev/udev-rules.c
+  src/udev/udev-rules.h
+  src/udev/udev-spawn.c
+  src/udev/udev-spawn.h
+  src/udev/udev-synth.c
+  src/udev/udev-synth.h
+  src/udev/udev-watch-fanotify.c
+  src/udev/udev-watch-inotify.c
+  src/udev/udev-watch.h
+  src/udev/udev-worker.c
+  src/udev/udev-worker.h
+  src/udev/udevadm-cat.c
+  src/udev/udevadm-control.c
+  src/udev/udevadm-info.c
+  src/udev/udevadm-lock.c
+  src/udev/udevadm-monitor.c
+  src/udev/udevadm-settle.c
+  src/udev/udevadm-test-builtin.c
+  src/udev/udevadm-test.c
+  src/udev/udevadm-trigger.c
+  src/udev/udevadm-util.c
+  src/udev/udevadm-util.h
+  src/udev/udevadm-verify.c
+  src/udev/udevadm-wait.c
+  src/udev/udevadm.c
+  src/udev/udevadm.h
+  src/udev/udevd.c
+  src/udev/udevd.h
+  src/udev/v4l_id/*
+Copyright: the respective authors; see each file
+License: GPL-2.0-or-later
+
+Files:
+  src/include/uapi/linux/auto_dev-ioctl.h
+  src/include/uapi/linux/auto_fs.h
+  src/include/uapi/linux/cfm_bridge.h
+  src/include/uapi/linux/hid.h
+  src/include/uapi/linux/if.h
+  src/include/uapi/linux/if_arp.h
+  src/include/uapi/linux/if_bridge.h
+  src/include/uapi/linux/if_ether.h
+  src/include/uapi/linux/if_macsec.h
+  src/include/uapi/linux/if_tun.h
+  src/include/uapi/linux/if_vlan.h
+  src/include/uapi/linux/in.h
+  src/include/uapi/linux/in6.h
+  src/include/uapi/linux/ip.h
+  src/include/uapi/linux/ipv6_route.h
+  src/include/uapi/linux/keyctl.h
+  src/include/uapi/linux/mrp_bridge.h
+  src/include/uapi/linux/netdevice.h
+  src/include/uapi/linux/sockios.h
+Copyright: the respective authors; see each file
+License: GPL-2.0-or-later WITH Linux-syscall-note
+
+Files:
+  src/basic/utf8.c
+Copyright: the respective authors; see each file
+License: LGPL-2.0-or-later
+
+Files:
+  src/include/uapi/linux/dm-ioctl.h
+Copyright: the respective authors; see each file
+License: LGPL-2.0-or-later WITH Linux-syscall-note
+
+Files:
+  src/core/load-fragment-gperf.gperf.in
+Copyright: the respective authors; see each file
+License: LGPL-2.1-or-later #}
+
+Files:
+  src/fundamental/sha1.c
+  src/fundamental/sha1.h
+Copyright: the respective authors; see each file
+License: LicenseRef-alg-sha1-public-domain
+
+Files:
+  src/libsystemd/sd-journal/lookup3.c
+  src/libsystemd/sd-journal/lookup3.h
+Copyright: the respective authors; see each file
+License: LicenseRef-lookup3-public-domain
+
+Files:
+  src/basic/MurmurHash2.c
+  src/basic/MurmurHash2.h
+Copyright: the respective authors; see each file
+License: LicenseRef-murmurhash2-public-domain
+
+Files:
+  hwdb.d/parse_hwdb.py
+  src/basic/sparse-endian.h
+  src/include/uapi/linux/batman_adv.h
+  tools/catalog-report.py
+Copyright: the respective authors; see each file
+License: MIT
+
+Files:
+  .clang-format
+  AGENTS.md
+  CLAUDE.md
+  hostname-wordlist/colors
+  hostname-wordlist/weather
+  hostname-wordlist/worlds
+  man/50-xdg-data-dirs.sh
+  man/90-rearrange-path.py
+  man/check-os-release-simple.py
+  man/check-os-release.py
+  man/check-os-release.sh
+  man/event-quick-child.c
+  man/fido2-crypttab.sh
+  man/glib-event-glue.c
+  man/hwdb-usb-device.c
+  man/id128-app-specific.c
+  man/inotify-watch-tmp.c
+  man/journal-enumerate-fields.c
+  man/journal-iterate-foreach.c
+  man/journal-iterate-poll.c
+  man/journal-iterate-unique.c
+  man/journal-iterate-wait.c
+  man/journal-stream-fd.c
+  man/logcontrol-example.c
+  man/notify-selfcontained-example.c
+  man/notify-selfcontained-example.py
+  man/path-documents.c
+  man/print-unit-path-call-method.c
+  man/print-unit-path.c
+  man/sd-bus-container-append.c
+  man/sd-bus-container-read.c
+  man/sd_bus_error-example.c
+  man/sd_bus_service_reconnect.c
+  man/sd_device_enumerator_add_match_parent-example.c
+  man/sd_device_enumerator_new-example.c
+  man/send-unit-files-changed.c
+  man/tpm2-crypttab.sh
+  man/vtable-example.c
+  man/yubikey-crypttab.sh
+  network/80-container-vb.link
+  network/80-container-ve.link
+  network/80-container-vz.link
+  network/99-default.link
+  src/login/10-systemd-logind-root-ignore-inhibitors.rules.example
+  src/systemd/sd-dlopen.h
+  src/ukify/test/pytest.ini
+Copyright: the respective authors; see each file
+License: MIT-0
+
+Files:
+  .ycm_extra_conf.py
+Copyright: the respective authors; see each file
+License: Unlicense
+
+License: BSD-2-Clause
+ Copyright (c) <year> <owner> All rights reserved.
+ .
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ .
+ 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ .
+ 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD-3-Clause
+ // Copyright 2014 The Chromium OS Authors. All rights reserved.
+ //
+ // Redistribution and use in source and binary forms, with or without
+ // modification, are permitted provided that the following conditions are
+ // met:
+ //
+ //    * Redistributions of source code must retain the above copyright
+ // notice, this list of conditions and the following disclaimer.
+ //    * Redistributions in binary form must reproduce the above
+ // copyright notice, this list of conditions and the following disclaimer
+ // in the documentation and/or other materials provided with the
+ // distribution.
+ //    * Neither the name of Google Inc. nor the names of its
+ // contributors may be used to endorse or promote products derived from
+ // this software without specific prior written permission.
+ //
+ // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ // A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ // OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ // SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ // LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ // DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: CC0-1.0
+ On Debian systems the full text can be found in
+ /usr/share/common-licenses/CC0-1.0.
+
+License: GPL-1.0-or-later
+ On Debian systems the full text can be found in
+ /usr/share/common-licenses/GPL-1.
+
+License: GPL-2.0-only
+ On Debian systems the full text can be found in
+ /usr/share/common-licenses/GPL-2.
+
+License: GPL-2.0-or-later
+ On Debian systems the full text can be found in
+ /usr/share/common-licenses/GPL-2.
+
+License: LGPL-2.0-or-later
+ On Debian systems the full text can be found in
+ /usr/share/common-licenses/LGPL-2.
+
+License: LGPL-2.1-or-later
+ On Debian systems the full text can be found in
+ /usr/share/common-licenses/LGPL-2.1.
+
+License: LicenseRef-alg-sha1-public-domain
+ SHA-1 in C, by Steve Reid <sreid@sea-to-sky.net>, Public Domain
+ Modified by James H. Brown <jbrown@burgoyne.com>, 7/98, Public Domain
+ Modified by Steve Reid <sreid@sea-to-sky.net>, 8/98, Public Domain
+ Modified by Saul Kravitz <Saul.Kravitz@celera.com>, 4/01, Public Domain
+ Modified by Ralph Giles <giles@ghostscript.com>, 07/2002, Public Domain
+ Modified by Björn Esser <besser82@fedoraproject.org>, 10/2017, Public Domain
+
+License: LicenseRef-lookup3-public-domain
+ lookup3.c, by Bob Jenkins, May 2006, Public Domain.
+
+License: LicenseRef-murmurhash2-public-domain
+ MurmurHash2 was written by Austin Appleby, and is placed in the public
+ domain. The author hereby disclaims copyright to this source code.
+
+License: Linux-syscall-note
+    NOTE! This copyright does *not* cover user programs that use kernel
+  services by normal system calls - this is merely considered normal use
+  of the kernel, and does *not* fall under the heading of "derived work".
+  Also note that the GPL below is copyrighted by the Free Software
+  Foundation, but the instance of code that it refers to (the Linux
+  kernel) is copyrighted by me and others who actually wrote it.
+ .
+  Also note that the only valid version of the GPL as far as the kernel
+  is concerned is _this_ particular version of the license (ie v2, not
+  v2.2 or v3.x or whatever), unless explicitly otherwise stated.
+ .
+                        Linus Torvalds
+
+License: MIT
+ MIT License
+ .
+ Copyright (c) <year> <copyright holders>
+ .
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+License: MIT-0
+ MIT No Attribution
+ .
+ Copyright <YEAR> <COPYRIGHT HOLDER>
+ .
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+License: Unlicense
+ This is free and unencumbered software released into the public domain.
+ .
+ Anyone is free to copy, modify, publish, use, compile, sell, or
+ distribute this software, either in source code form or as a compiled
+ binary, for any purpose, commercial or non-commercial, and by any
+ means.
+ .
+ In jurisdictions that recognize copyright laws, the author or authors
+ of this software dedicate any and all copyright interest in the
+ software to the public domain. We make this dedication for the benefit
+ of the public at large and to the detriment of our heirs and
+ successors. We intend this dedication to be an overt act of
+ relinquishment in perpetuity of all present and future rights to this
+ software under copyright law.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ .
+ For more information, please refer to <http://unlicense.org/>

@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+post_common() {
+        systemd-sysusers
+        journalctl --update-catalog
+        systemd-hwdb --usr update
+        udevadm control --reload 2>/dev/null || true
+}
+
+post_install() {
+        systemd-machine-id-setup
+        post_common
+        # Enable what the presets enable, never disable what an admin enabled.
+        systemctl preset-all --preset-mode=enable-only
+        echo ':: systemE does not ship systemd-networkd or systemd-resolved.'
+        echo '   Set up NetworkManager (or similar) and a resolver before rebooting.'
+}
+
+post_upgrade() {
+        post_common
+        systemctl daemon-reexec 2>/dev/null || true
+}

@@ -1,0 +1,125 @@
+Source: systeme
+Section: admin
+Priority: optional
+Maintainer: systemE developers <packaging@systeme.invalid>
+Build-Depends:
+ debhelper-compat (= 13),
+ meson (>= 0.62),
+ ninja-build,
+ gperf,
+ pkgconf,
+ python3,
+ python3-jinja2,
+ python3-pyelftools,
+ xsltproc,
+ docbook-xsl,
+ docbook-xml,
+ libcap-dev,
+ libmount-dev,
+ libblkid-dev,
+ libfdisk-dev,
+ libacl1-dev,
+ libaudit-dev,
+ libpam0g-dev,
+ libseccomp-dev,
+ libselinux1-dev,
+ libapparmor-dev,
+ libcryptsetup-dev,
+ libssl-dev,
+ libgnutls28-dev,
+ libkmod-dev,
+ libidn2-dev,
+ libpcre2-dev,
+ libzstd-dev,
+ liblz4-dev,
+ liblzma-dev,
+ libbz2-dev,
+ libdw-dev,
+ libtss2-dev,
+ libfido2-dev,
+ libp11-kit-dev,
+ libpwquality-dev,
+ libqrencode-dev,
+ libarchive-dev,
+ libcurl4-openssl-dev,
+ libxkbcommon-dev,
+ libdbus-1-dev,
+ libglib2.0-dev,
+ libpolkit-gobject-1-dev,
+Standards-Version: 4.7.0
+Homepage: https://github.com/clrealy/systemE
+Vcs-Git: https://github.com/clrealy/systemE.git
+Rules-Requires-Root: no
+
+Package: systeme
+Architecture: linux-any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsysteme0 (= ${binary:Version}), dbus | dbus-system-bus
+Recommends: network-manager | ifupdown | connman
+Provides:
+ systemd (= ${binary:Version}),
+ systemd-sysv (= ${binary:Version}),
+ udev (= ${binary:Version}),
+ libpam-systemd (= ${binary:Version}),
+ libnss-systemd (= ${binary:Version}),
+ libnss-myhostname (= ${binary:Version}),
+ systemd-timesyncd (= ${binary:Version}),
+ systemd-oomd (= ${binary:Version}),
+ systemd-coredump (= ${binary:Version}),
+ systemd-boot (= ${binary:Version}),
+ systemd-boot-efi (= ${binary:Version}),
+ systemd-ukify (= ${binary:Version}),
+ systemd-sysusers,
+ systemd-tmpfiles,
+ time-daemon,
+Conflicts:
+ systemd, systemd-sysv, udev, libpam-systemd, libnss-systemd, libnss-myhostname,
+ systemd-timesyncd, systemd-oomd, systemd-coredump, systemd-boot, systemd-boot-efi,
+ systemd-ukify, systemd-standalone-sysusers, systemd-standalone-tmpfiles,
+ libsystemd-shared, systemd-resolved, systemd-homed, systemd-userdbd,
+ systemd-journal-remote, systemd-container, libnss-mymachines, libnss-resolve,
+ sysvinit-core
+Replaces:
+ systemd, systemd-sysv, udev, libpam-systemd, libnss-systemd, libnss-myhostname,
+ systemd-timesyncd, systemd-oomd, systemd-coredump, systemd-boot, systemd-boot-efi,
+ systemd-ukify, systemd-standalone-sysusers, systemd-standalone-tmpfiles,
+ libsystemd-shared, systemd-resolved, systemd-homed, systemd-userdbd,
+ systemd-journal-remote, systemd-container, libnss-mymachines, libnss-resolve
+Description: systemE system and service manager
+ systemE is a fork of systemd with a reduced set of components and every
+ external interface kept identical, so it replaces systemd on an existing
+ system without the rest of the system noticing.
+ .
+ It does not ship systemd-networkd or systemd-resolved: a system that uses
+ either needs another network manager and resolver before switching. See
+ /usr/share/doc/systeme/README.Debian.
+
+Package: libsysteme0
+Architecture: linux-any
+Multi-Arch: same
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides:
+ libsystemd0 (= ${binary:Version}),
+ libudev1 (= ${binary:Version}),
+Conflicts: libsystemd0, libudev1
+Replaces: libsystemd0, libudev1
+Description: systemE client libraries
+ libsystemd and libudev as built by systemE. The ABI is upstream's,
+ unchanged, so packages built against libsystemd0 and libudev1 run against
+ these without being rebuilt.
+
+Package: systeme-dev
+Architecture: linux-any
+Multi-Arch: same
+Section: libdevel
+Depends: ${misc:Depends}, libsysteme0 (= ${binary:Version})
+Provides:
+ systemd-dev (= ${binary:Version}),
+ libsystemd-dev (= ${binary:Version}),
+ libudev-dev (= ${binary:Version}),
+Conflicts: systemd-dev, libsystemd-dev, libudev-dev
+Replaces: systemd-dev, libsystemd-dev, libudev-dev
+Description: systemE development files
+ Headers, pkg-config files and the unversioned shared library links for
+ libsystemd and libudev.

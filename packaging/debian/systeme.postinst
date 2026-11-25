@@ -1,0 +1,33 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ]; then
+        # The users and groups systemE's units run as.
+        systemd-sysusers
+
+        # The compiled hardware database udev reads.
+        systemd-hwdb update
+
+        systemd-machine-id-setup
+
+        # In a chroot some entries name things that only exist on a running
+        # system. Report it rather than fail the install: boot applies them.
+        systemd-tmpfiles --create >/dev/null 2>&1 || \
+                echo "systeme: some tmpfiles.d entries could not be applied now; they will be at boot." >&2
+
+        if [ -z "$2" ]; then
+                # First install, which is also the moment systemE replaces systemd.
+                # Enable what the presets enable, but never disable anything an
+                # administrator had enabled.
+                systemctl preset-all --preset-mode=enable-only || true
+        fi
+
+        # If a manager is running, move it onto the new binary in place.
+        if [ -d /run/systemd/system ]; then
+                systemctl daemon-reexec || true
+        fi
+fi
+
+#DEBHELPER#
+
+exit 0

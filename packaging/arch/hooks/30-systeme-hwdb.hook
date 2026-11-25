@@ -1,0 +1,11 @@
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Target = usr/lib/udev/hwdb.d/*
+
+[Action]
+Description = Updating the hardware database...
+When = PostTransaction
+Exec = /usr/bin/systemd-hwdb --usr update

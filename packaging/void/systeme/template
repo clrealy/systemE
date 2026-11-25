@@ -1,0 +1,51 @@
+# Template file for 'systeme'
+#
+# EXPERIMENTAL and UNTESTED. Void runs runit and has no systemd package to
+# replace; installing this does not change the init system.
+#
+# Copy this directory into srcpkgs/ of void-packages, set version and checksum,
+# then: ./xbps-src pkg systeme
+pkgname=systeme
+version=263.0
+revision=1
+build_style=meson
+configure_args="-Dmode=release -Dbootloader=disabled -Dman=enabled
+ -Drust=disabled -Dbpf-framework=disabled -Dxenctrl=disabled
+ -Dselinux=disabled -Dapparmor=disabled -Dinstall-tests=false"
+hostmakedepends="gperf pkg-config python3-Jinja2 python3-pyelftools libxslt
+ docbook-xsl"
+makedepends="libcap-devel libmount-devel libblkid-devel acl-devel
+ libseccomp-devel cryptsetup-devel openssl-devel kmod-devel libidn2-devel
+ pcre2-devel libzstd-devel liblz4-devel liblzma-devel elfutils-devel
+ tpm2-tss-devel libfido2-devel p11-kit-devel libarchive-devel libcurl-devel
+ libxkbcommon-devel dbus-devel pam-devel"
+depends="dbus"
+short_desc="systemE system and service manager, a fork of systemd"
+maintainer="systemE developers <packaging@systeme.invalid>"
+license="LGPL-2.1-or-later, GPL-2.0-or-later"
+homepage="https://github.com/clrealy/systemE"
+distfiles="https://github.com/clrealy/systemE/archive/refs/heads/main.tar.gz>systeme-${version}.tar.gz"
+checksum=badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadb
+
+if [ "$XBPS_TARGET_LIBC" = musl ]; then
+	configure_args+=" -Dlibc=musl"
+fi
+
+systeme-libs_package() {
+	short_desc+=" - client libraries"
+	pkg_install() {
+		vmove "usr/lib/libsystemd.so.*"
+		vmove "usr/lib/libudev.so.*"
+	}
+}
+
+systeme-devel_package() {
+	short_desc+=" - development files"
+	depends="systeme-libs>=${version}_${revision}"
+	pkg_install() {
+		vmove usr/include
+		vmove "usr/lib/*.so"
+		vmove usr/lib/pkgconfig
+		vmove usr/share/pkgconfig
+	}
+}

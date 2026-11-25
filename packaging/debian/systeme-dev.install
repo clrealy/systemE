@@ -1,0 +1,6 @@
+usr/include
+usr/lib/${DEB_HOST_MULTIARCH}/libsystemd.so
+usr/lib/${DEB_HOST_MULTIARCH}/libudev.so
+usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig
+usr/share/pkgconfig
+usr/lib/rpm

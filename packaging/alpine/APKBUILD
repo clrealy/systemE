@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+#
+# systemE for Alpine Linux. EXPERIMENTAL and UNTESTED: Alpine is built on musl
+# and runs OpenRC, and systemd's musl support is recent. Installing this does
+# not change the init system; boot with init=/usr/lib/systemd/systemd to try it.
+#
+# Set pkgver and the source tarball, then: abuild checksum && abuild -r
+
+pkgname=systeme
+pkgver=263_git20261125
+pkgrel=0
+pkgdesc="systemE system and service manager, a fork of systemd"
+url="https://github.com/clrealy/systemE"
+arch="all"
+license="LGPL-2.1-or-later AND GPL-2.0-or-later"
+depends="dbus"
+makedepends="meson gperf py3-jinja2 py3-elftools libxslt docbook-xsl
+        linux-headers libcap-dev util-linux-dev acl-dev audit-dev
+        linux-pam-dev libseccomp-dev cryptsetup-dev openssl-dev kmod-dev
+        libidn2-dev pcre2-dev zstd-dev lz4-dev xz-dev bzip2-dev elfutils-dev
+        tpm2-tss-dev libfido2-dev p11-kit-dev libarchive-dev curl-dev
+        libxkbcommon-dev dbus-dev"
+subpackages="$pkgname-dev $pkgname-libs $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/clrealy/systemE/archive/refs/heads/main.tar.gz"
+builddir="$srcdir/systemE-main"
+# libudev is also provided by eudev; the two cannot be installed together.
+replaces="eudev-libs"
+
+build() {
+        abuild-meson \
+                -Dlibc=musl \
+                -Dmode=release \
+                -Dbootloader=disabled \
+                -Dman=enabled \
+                -Drust=disabled \
+                -Dbpf-framework=disabled \
+                -Dxenctrl=disabled \
+                -Dselinux=disabled \
+                -Dapparmor=disabled \
+                -Dinstall-tests=false \
+                . output
+        meson compile -C output
+}
+
+check() {
+        meson test -C output --print-errorlogs
+}
+
+package() {
+        DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+libs() {
+        pkgdesc="systemE client libraries (libsystemd, libudev)"
+        amove usr/lib/libsystemd.so.* usr/lib/libudev.so.*
+}
+
+sha512sums="SKIP"

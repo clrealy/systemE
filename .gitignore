@@ -42,3 +42,8 @@ __pycache__/
 
 # install.sh stages here
 /dest/
+
+# packaging/build-deb.sh output
+/packaging/out/
+/debian/
+/obj-*/

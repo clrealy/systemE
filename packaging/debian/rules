@@ -1,0 +1,36 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+include /usr/share/dpkg/architecture.mk
+
+%:
+	dh $@ --buildsystem=meson
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		-Dmode=release \
+		-Dbootloader=enabled \
+		-Dman=enabled \
+		-Dhtml=disabled \
+		-Drust=disabled \
+		-Dbpf-framework=disabled \
+		-Dxenctrl=disabled \
+		-Dinstall-tests=false
+
+# The private libsystemd-shared and libsystemd-core live under the multiarch
+# systemd/ directory, which dpkg-shlibdeps does not search on its own.
+override_dh_shlibdeps:
+	dh_shlibdeps -l$(CURDIR)/debian/systeme/usr/lib/$(DEB_HOST_MULTIARCH)/systemd
+
+# Only the public libraries get a shlibs entry. The private ones are internal
+# to systeme, and the NSS and PAM modules are loaded, not linked against.
+override_dh_makeshlibs:
+	dh_makeshlibs -plibsysteme0
+
+# systemE is the service manager. The helpers that enable a package's units and
+# poke the running manager on install are for packages that run under it.
+override_dh_installsystemd:
+override_dh_installsystemduser:
+
+override_dh_missing:
+	dh_missing --fail-missing

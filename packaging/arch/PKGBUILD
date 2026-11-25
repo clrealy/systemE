@@ -1,0 +1,85 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+#
+# systemE for Arch Linux (and Artix, though Artix's whole point is not to run a
+# systemd-compatible init). Builds from the repository it lives in.
+#
+#   cd packaging/arch && makepkg -si
+
+pkgbase=systeme
+pkgname=(systeme systeme-libs)
+pkgver=0
+pkgrel=1
+pkgdesc='systemE system and service manager, a fork of systemd'
+arch=(x86_64 aarch64)
+url='https://github.com/clrealy/systemE'
+license=(LGPL-2.1-or-later GPL-2.0-or-later)
+makedepends=(git meson gperf python-jinja python-pyelftools libxslt docbook-xsl
+             acl audit cryptsetup curl kmod libarchive libcap libelf libfido2
+             libidn2 libpwquality libseccomp libxcrypt lz4 p11-kit pam pcre2
+             qrencode tpm2-tss util-linux xz zstd dbus libxkbcommon polkit)
+source=("systeme::git+file://$(cd "$startdir/../.." && pwd)")
+sha256sums=(SKIP)
+
+pkgver() {
+        cd systeme
+        # meson.version, with the tilde made pacman-safe, then commits and hash.
+        printf '%s.r%s.%s' "$(tr -d ' \n' < meson.version | tr '~' '.')" \
+                "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+build() {
+        arch-meson systeme build \
+                -Dmode=release \
+                -Dbootloader=enabled \
+                -Dman=enabled \
+                -Drust=disabled \
+                -Dbpf-framework=disabled \
+                -Dxenctrl=disabled \
+                -Dinstall-tests=false
+        meson compile -C build
+}
+
+check() {
+        meson test -C build --print-errorlogs
+}
+
+package_systeme() {
+        depends=(systeme-libs acl bash cryptsetup dbus kbd kmod libcap libelf
+                 libidn2 libseccomp libxcrypt lz4 openssl pam pcre2 util-linux
+                 xz audit)
+        optdepends=('networkmanager: systemE does not ship systemd-networkd'
+                    'openresolv: systemE does not ship systemd-resolved')
+        provides=(systemd systemd-sysvcompat systemd-ukify nss-myhostname
+                  "init" udev)
+        conflicts=(systemd systemd-sysvcompat systemd-resolvconf systemd-ukify
+                   nss-myhostname udev)
+        replaces=(systemd systemd-sysvcompat)
+        backup=(etc/systemd/{coredump,journald,logind,oomd,sleep,system,timesyncd,user}.conf
+                etc/udev/{udev,iocost}.conf)
+        install=systeme.install
+
+        meson install -C build --destdir "$pkgdir"
+
+        # libsystemd and libudev belong to systeme-libs
+        mkdir -p "$srcdir/libs"
+        mv "$pkgdir"/usr/lib/lib{systemd,udev}.so* "$srcdir/libs/"
+        mv "$pkgdir"/usr/lib/pkgconfig "$srcdir/libs/"
+        mv "$pkgdir"/usr/include "$srcdir/libs/"
+
+        # pacman hooks that keep users, tmpfiles, hwdb and the running manager
+        # current as other packages install files.
+        install -Dm644 -t "$pkgdir/usr/share/libalpm/hooks" "$startdir"/hooks/*.hook
+}
+
+package_systeme-libs() {
+        pkgdesc='systemE client libraries (libsystemd, libudev)'
+        depends=(glibc libcap libgcrypt lz4 xz zstd)
+        provides=(systemd-libs libsystemd.so libudev.so)
+        conflicts=(systemd-libs)
+        replaces=(systemd-libs)
+
+        install -dm755 "$pkgdir"/usr/lib
+        mv "$srcdir"/libs/lib{systemd,udev}.so* "$pkgdir"/usr/lib/
+        mv "$srcdir"/libs/pkgconfig "$pkgdir"/usr/lib/
+        mv "$srcdir"/libs/include "$pkgdir"/usr/
+}
