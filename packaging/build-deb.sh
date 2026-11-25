@@ -20,7 +20,10 @@ fi
 upstream=$(tr -d ' \n' < meson.version)
 commit=$(git rev-parse --short=7 HEAD 2>/dev/null || echo unknown)
 stamp=$(git log -1 --format=%cd --date=format:%Y%m%d 2>/dev/null || date +%Y%m%d)
-version="${upstream}+git${stamp}.${commit}"
+count=$(git rev-list --count HEAD 2>/dev/null || echo 0)
+# The commit count keeps two snapshots from the same day in order; the hash alone
+# would sort them arbitrarily.
+version="${upstream}+git${stamp}.${count}.${commit}"
 
 rm -rf debian
 cp -r packaging/debian debian

@@ -26,8 +26,12 @@ while [ $# -gt 0 ]; do
         esac
 done
 
-debs=(packaging/out/systeme_*.deb packaging/out/libsysteme0_*.deb)
-[ -e "${debs[0]}" ] || { echo "test-deb.sh: build the packages first (packaging/build-deb.sh)" >&2; exit 1; }
+# packaging/out/ keeps every build; test the most recently built one.
+newest=$(ls -1t packaging/out/systeme_*.deb 2>/dev/null | head -1)
+[ -n "$newest" ] || { echo "test-deb.sh: build the packages first (packaging/build-deb.sh)" >&2; exit 1; }
+ver=$(dpkg-deb -f "$newest" Version)
+debs=(packaging/out/systeme_"$ver"_*.deb packaging/out/libsysteme0_"$ver"_*.deb)
+echo "==> testing version $ver"
 KERNEL=$(ls -1 /boot/vmlinuz-* | tail -1)
 
 WORK=$(mktemp -d)

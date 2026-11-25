@@ -15,7 +15,10 @@ cd "$(dirname "$0")/.."
 upstream=$(tr -d ' \n' < meson.version)
 commit=$(git rev-parse --short=7 HEAD)
 stamp=$(git log -1 --format=%cd --date=format:%Y%m%d)
-version="${upstream}^git${stamp}.${commit}"
+count=$(git rev-list --count HEAD)
+# The commit count keeps two snapshots from the same day in order; the hash alone
+# would sort them arbitrarily.
+version="${upstream}^git${stamp}.${count}.${commit}"
 
 top=$(mktemp -d)
 trap 'rm -rf "$top"' EXIT
