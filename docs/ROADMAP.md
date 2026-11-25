@@ -218,6 +218,34 @@ systemE reached multi-user.target.
 journald, logind, udevd, oomd, timesyncd, getty and serial-getty all start. The one failure is
 the test rig, not systemE: an initramfs has no linker cache for `ldconfig` to rebuild.
 
+### Status markers
+
+systemE prints a marker rather than a word:
+
+| marker | ASCII | meaning |
+|---|---|---|
+| `[$▶]` | `[$>]` | starting |
+| `[$▮]` | `[$+]` | started, or reached |
+| `[$✗]` | `[$x]` | failed |
+| `[$‖]` | `[$=]` | stopped |
+| `[$…]` | `[$.]` | waiting, skipped or unsupported |
+
+```
+[$▮] Created slice user.slice.
+[$▶] Expecting device dev-ttyS0.device...
+[$…] Starting of proc-sys-fs-binfmt_misc.automount unsupported.
+[$✗] Failed to start ldconfig.service.
+[$‖] Stopped target multi-user.target.
+```
+
+Each marker is two columns wide, `$` plus one glyph, where upstream's words were six. The
+indent that aligns continuation lines under them moved with it, in `show-status.c`.
+
+The glyphs go through the same table as the rest of systemd's, so a console that cannot do
+UTF-8 gets the ASCII column instead of mojibake. Both renderings are checked by booting with
+and without `SYSTEMD_UTF8=0`: the marker counts come out identical, 45 starting, 92 started,
+2 failed, 60 stopped, 1 waiting.
+
 Three things the rig had to get right, each of which produced a convincing wrong answer first:
 
 - **`ldd` is not enough.** systemd `dlopen`s most of its optional dependencies, so the libraries

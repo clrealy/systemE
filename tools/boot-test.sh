@@ -17,6 +17,7 @@ BUILD=build
 TARGET=multi-user.target
 KEEP=0
 TIMEOUT=600
+EXTRA_CMDLINE=${BOOT_TEST_EXTRA_CMDLINE:-}
 
 while [ $# -gt 0 ]; do
         case "$1" in
@@ -128,7 +129,7 @@ After=$TARGET
 Type=oneshot
 StandardOutput=journal+console
 ExecStart=/bin/sh -c 'echo "BOOT-TEST-STATE: \$(/usr/bin/systemctl is-system-running)"; /usr/bin/systemctl --no-pager --no-legend --failed || true; echo BOOT-TEST-END'
-ExecStopPost=/bin/sh -c '/usr/bin/systemctl --force poweroff || /bin/busybox poweroff -f'
+ExecStopPost=/bin/sh -c '/usr/bin/systemctl poweroff || /usr/bin/systemctl --force poweroff || /bin/busybox poweroff -f'
 [Install]
 WantedBy=$TARGET
 UNIT
@@ -140,17 +141,25 @@ echo "==> packing initramfs"
 echo "==> booting"
 timeout "$TIMEOUT" qemu-system-x86_64 \
         -kernel "$KERNEL" -initrd "$WORK/initramfs.cpio.gz" \
-        -append "console=ttyS0 rw systemd.firstboot=no systemd.log_target=console systemd.show_status=yes systemd.unit=$TARGET" \
+        -append "console=ttyS0 rw systemd.firstboot=no systemd.log_target=console systemd.show_status=yes systemd.unit=$TARGET $EXTRA_CMDLINE" \
         -m 1024 -smp 2 -nographic -no-reboot > "$WORK/boot.log" 2>&1 || true
 
 sed -e 's/\x1b\[[0-9;:]*[a-zA-Z]//g' -e 's/\x1b\][^\x07]*\x07//g' "$WORK/boot.log" > "$WORK/boot.txt"
-ok=$(grep -c '\[  OK  \]' "$WORK/boot.txt" || true)
-failed=$(grep -E '\[FAILED\]' "$WORK/boot.txt" | sort -u | wc -l || true)
+# Count systemE's markers in whichever rendering the console got: the UTF-8 glyphs,
+# or the ASCII fallback used when the console cannot do UTF-8.
+count_marker() { # count_marker <utf8-glyph> <ascii-char>
+        a=$(grep -cF "[\$$1]" "$WORK/boot.txt" || true)
+        b=$(grep -cF "[\$$2]" "$WORK/boot.txt" || true)
+        echo $((a + b))
+}
+ok=$(count_marker '▮' '+')
+failed_lines=$( { grep -F "[\$✗]" "$WORK/boot.txt" || true; grep -F '[$x]' "$WORK/boot.txt" || true; } | sed 's/^ *//' | sort -u )
+failed=$(printf '%s' "$failed_lines" | grep -c . || true)
 
 echo
 echo "  units started : $ok"
 echo "  units failed  : $failed"
-grep -E '\[FAILED\]' "$WORK/boot.txt" | sed 's/^ *//' | sort -u | sed 's/^/    /' || true
+printf '%s\n' "$failed_lines" | sed '/^$/d;s/^/    /'
 sed -n '/BOOT-TEST-STATE/,/BOOT-TEST-END/p' "$WORK/boot.txt" | sed 's/^ *//;s/^\[ *[0-9.]*\] *//' | sed 's/^/  /'
 [ "$KEEP" -eq 1 ] && echo "  console log   : $WORK/boot.txt"
 

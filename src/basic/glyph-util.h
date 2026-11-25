@@ -32,6 +32,14 @@ typedef enum Glyph {
         GLYPH_ARROW_RIGHT,
         GLYPH_ELLIPSIS,
         GLYPH_EXTERNAL_LINK,
+        /* systemE boot status markers. Each ASCII fallback is one character wide, like each
+         * UTF-8 glyph, so that the status column keeps its width on a console that cannot do
+         * UTF-8 and continuation lines stay aligned. */
+        GLYPH_STATUS_STARTING,
+        GLYPH_STATUS_OK,
+        GLYPH_STATUS_FAILED,
+        GLYPH_STATUS_STOPPED,
+        GLYPH_STATUS_WAITING,
         _GLYPH_FIRST_EMOJI,
         GLYPH_ECSTATIC_SMILEY = _GLYPH_FIRST_EMOJI,
         GLYPH_HAPPY_SMILEY,
