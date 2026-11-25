@@ -750,17 +750,14 @@ static const struct {
 };
 
 /* "$" plus one glyph, so every marker is two columns wide. See STATUS_INDENT. */
-static const char* job_status_marker(JobType t, JobResult result) {
+static Glyph job_status_glyph(JobType t, JobResult result) {
         Glyph g = job_done_messages[result].glyph;
 
-        if (g == GLYPH_NONE)
-                return NULL;
-
         /* A stop that succeeded is not the same event as a start that succeeded. */
-        if (result == JOB_DONE && IN_SET(t, JOB_STOP, JOB_RESTART))
+        if (g != GLYPH_NONE && result == JOB_DONE && IN_SET(t, JOB_STOP, JOB_RESTART))
                 g = GLYPH_STATUS_STOPPED;
 
-        return strjoina("$", glyph(g));
+        return g;
 }
 
 static const char* job_done_mid(JobType type, JobResult result) {
@@ -800,7 +797,9 @@ static void job_emit_done_message(Unit *u, uint32_t job_id, JobType t, JobResult
 
         ident = unit_status_string(u, &free_ident);
 
-        const char *status = job_status_marker(t, result);
+        /* Built here, not in a helper: strjoina() is alloca(), so it must not outlive this frame. */
+        Glyph g = job_status_glyph(t, result);
+        const char *status = g != GLYPH_NONE ? strjoina("$", glyph(g)) : NULL;
         bool do_console = t != JOB_RELOAD && status;
         bool console_only = do_console && log_on_console();
 
