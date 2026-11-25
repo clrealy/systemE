@@ -59,18 +59,41 @@ printf '#!/bin/sh\nexit 101\n' > "$R/usr/sbin/policy-rc.d"; chmod +x "$R/usr/sbi
 
 mkdir -p "$R/tmp/systeme"; cp "${debs[@]}" "$R/tmp/systeme/"
 echo "==> apt install ./systeme*.deb"
-chroot "$R" env DEBIAN_FRONTEND=noninteractive \
-        apt-get install -y --no-install-recommends /tmp/systeme/*.deb 2>&1 | tee "$WORK/apt.log" | \
-        grep -E "^(The following|  [a-z]|Removing|Unpacking systeme|Setting up (systeme|libsysteme))" || true
-rc=${PIPESTATUS[0]}
+# The glob has to expand inside the chroot: expanded by this shell it matches
+# nothing on the host and apt is handed the literal pattern.
+set +e
+chroot "$R" sh -c 'DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends /tmp/systeme/*.deb' \
+        >"$WORK/apt.log" 2>&1
+rc=$?
+set -e
+grep -E "^(The following|  [a-z]|Removing|Unpacking systeme|Setting up (systeme|libsysteme))" "$WORK/apt.log" || true
 rm -f "$R/usr/sbin/policy-rc.d"
 for m in dev/pts dev proc sys; do umount "$R/$m"; done
-[ "$rc" -eq 0 ] || { echo "apt failed; see $WORK/apt.log" >&2; KEEP=1; exit 1; }
+if [ "$rc" -ne 0 ]; then
+        echo "apt failed (exit $rc):" >&2; tail -20 "$WORK/apt.log" >&2; KEEP=1; exit 1
+fi
 
 echo "==> after"
 chroot "$R" dpkg-query -W -f '    ${Package} ${Version} ${db:Status-Abbrev}\n' systeme libsysteme0 systemd udev libsystemd0 systemd-resolved 2>/dev/null | sed 's/ *$//' || true
+status() { chroot "$R" dpkg-query -W -f '${db:Status-Abbrev}' "$1" 2>/dev/null | tr -d ' '; }
+for p in systeme libsysteme0; do
+        [ "$(status $p)" = ii ] || { echo "test-deb.sh: $p is not installed after apt" >&2; KEEP=1; exit 1; }
+done
+for p in systemd udev libsystemd0 systemd-resolved; do
+        case "$(status $p)" in ii|iU|iF) echo "test-deb.sh: $p is still installed; the swap did not happen" >&2; KEEP=1; exit 1 ;; esac
+done
 
 # A unit that reports state and powers off, so the boot ends on its own.
+mkdir -p "$R/usr/local/sbin"
+cat > "$R/usr/local/sbin/systeme-verdict" <<'VERDICT'
+#!/bin/sh
+echo "PKG-TEST-PACKAGE: $(dpkg-query -W -f '${Package} ${Version}' systeme)"
+echo "PKG-TEST-MANAGER: $(systemctl --version | head -1)"
+echo "PKG-TEST-STATE: $(systemctl is-system-running)"
+systemctl --no-pager --no-legend --failed
+echo PKG-TEST-END
+VERDICT
+chmod +x "$R/usr/local/sbin/systeme-verdict"
 cat > "$R/etc/systemd/system/boot-verdict.service" <<'UNIT'
 [Unit]
 Description=systemE packaging boot verdict
@@ -78,7 +101,7 @@ After=multi-user.target
 [Service]
 Type=oneshot
 StandardOutput=journal+console
-ExecStart=/bin/sh -c 'echo "PKG-TEST-PACKAGE: $(dpkg-query -W -f "\${Package} \${Version}" systeme)"; echo "PKG-TEST-STATE: $(systemctl is-system-running)"; systemctl --no-pager --no-legend --failed; echo PKG-TEST-END'
+ExecStart=/usr/local/sbin/systeme-verdict
 ExecStopPost=/bin/sh -c 'systemctl poweroff || systemctl --force poweroff'
 [Install]
 WantedBy=multi-user.target
@@ -100,9 +123,16 @@ sed -e 's/\x1b\[[0-9;:]*[a-zA-Z]//g' -e 's/\x1b\][^\x07]*\x07//g' "$WORK/boot.lo
 echo
 sed -n '/PKG-TEST-PACKAGE/,/PKG-TEST-END/p' "$WORK/boot.txt" | sed 's/^ *//;s/^\[ *[0-9.]*\] *//;s/^[a-z]*\[[0-9]*\]: //;s/^/  /'
 [ "$KEEP" -eq 1 ] && echo "  console log: $WORK/boot.txt"
-if grep -q "Reached target .*multi-user.target" "$WORK/boot.txt"; then
+# Any systemd prints "Reached target multi-user.target". Only systemE prints its
+# [$..] status markers, and the verdict must name the systeme package, so both
+# are required: otherwise a boot of the distribution's own systemd would pass.
+reached=0; grep -q "Reached target .*multi-user.target" "$WORK/boot.txt" && reached=1
+markers=$(grep -c '\[\$' "$WORK/boot.txt" || true)
+named=0; grep -q "PKG-TEST-PACKAGE: systeme " "$WORK/boot.txt" && named=1
+echo "  multi-user reached: $reached   systemE markers: $markers   verdict names systeme: $named"
+if [ "$reached" = 1 ] && [ "$markers" -gt 0 ] && [ "$named" = 1 ]; then
         echo "systemE, installed by apt over $SUITE's systemd, reached multi-user.target."
         exit 0
 fi
-echo "It did NOT reach multi-user.target." >&2
+echo "FAILED: that was not a systemE boot reaching multi-user.target." >&2
 KEEP=1; exit 1
