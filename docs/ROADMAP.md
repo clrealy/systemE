@@ -201,6 +201,63 @@ Two things that make it trustworthy rather than decorative:
 while every command in it was run by hand in this container, the YAML is unproven until a PR
 triggers it.
 
+## Does it boot
+
+Yes. `tools/boot-test.sh` boots systemE as PID 1 in qemu and exits non-zero unless the default
+target is reached. No KVM is needed; software emulation takes a couple of minutes.
+
+Most recent run, against a build configured with `--auto-features=enabled`:
+
+```
+  units started : 87
+  units failed  : 1
+    [FAILED] Failed to start ldconfig.service.
+systemE reached multi-user.target.
+```
+
+journald, logind, udevd, oomd, timesyncd, getty and serial-getty all start. The one failure is
+the test rig, not systemE: an initramfs has no linker cache for `ldconfig` to rebuild.
+
+### Status markers
+
+systemE prints a marker rather than a word:
+
+| marker | ASCII | meaning |
+|---|---|---|
+| `[$▶]` | `[$>]` | starting |
+| `[$▮]` | `[$+]` | started, or reached |
+| `[$✗]` | `[$x]` | failed |
+| `[$‖]` | `[$=]` | stopped |
+| `[$…]` | `[$.]` | waiting, skipped or unsupported |
+
+```
+[$▮] Created slice user.slice.
+[$▶] Expecting device dev-ttyS0.device...
+[$…] Starting of proc-sys-fs-binfmt_misc.automount unsupported.
+[$✗] Failed to start ldconfig.service.
+[$‖] Stopped target multi-user.target.
+```
+
+Each marker is two columns wide, `$` plus one glyph, where upstream's words were six. The
+indent that aligns continuation lines under them moved with it, in `show-status.c`.
+
+The glyphs go through the same table as the rest of systemd's, so a console that cannot do
+UTF-8 gets the ASCII column instead of mojibake. Both renderings are checked by booting with
+and without `SYSTEMD_UTF8=0`: the marker counts come out identical, 45 starting, 92 started,
+2 failed, 60 stopped, 1 waiting.
+
+Three things the rig had to get right, each of which produced a convincing wrong answer first:
+
+- **`ldd` is not enough.** systemd `dlopen`s most of its optional dependencies, so the libraries
+  it needs at runtime are invisible to the linker. Without them PID 1 dies at
+  `Failed to mount early API filesystems`, because `mount_option_mangle()` reaches libmount
+  through `dlopen`. The rig reads `.note.dlopen` instead, the same ELF notes
+  `closure-report.py` uses.
+- **Absolute paths.** systemd invokes `/usr/bin/mount` by the path it was built with, so a
+  busybox `mount` on `PATH` is not enough and seven mount units fail.
+- **`systemd.firstboot=no`.** Otherwise the boot reaches first-boot setup and waits for someone
+  to type a timezone, which looks exactly like a hang.
+
 ## Still open, deliberately
 
 **Is the binary journal format in scope?** Strongest remaining Unix-philosophy target, most

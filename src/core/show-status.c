@@ -36,7 +36,10 @@ int parse_show_status(const char *s, ShowStatus *ret) {
 }
 
 int status_vprintf(const char *status, ShowStatusFlags flags, const char *format, va_list ap) {
-        static const char status_indent[] = "         "; /* "[" STATUS "] " */
+        /* "[" MARKER "] ", where a systemE marker is "$" plus one glyph: five columns.
+         * Continuation lines pass an empty status and are indented by this instead, so the
+         * two must agree or the console output stops lining up. */
+        static const char status_indent[] = "     ";
         static bool prev_ephemeral = false;
         static int dumb = -1;
 

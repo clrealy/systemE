@@ -12,6 +12,7 @@
 #include "dbus.h"
 #include "dbus-job.h"
 #include "escape.h"
+#include "glyph-util.h"
 #include "job.h"
 #include "log.h"
 #include "manager.h"
@@ -645,7 +646,11 @@ static void job_emit_start_message(Unit *u, uint32_t job_id, JobType t) {
         /* Log to the console second. */
         if (do_console) {
                 DISABLE_WARNING_FORMAT_NONLITERAL;
-                unit_status_printf(u, STATUS_TYPE_NORMAL, "", format, ident);
+                const char *marker = strjoina("$", glyph(GLYPH_STATUS_STARTING));
+                if (log_get_show_color())
+                        marker = strjoina(ANSI_HIGHLIGHT, marker, ANSI_NORMAL);
+
+                unit_status_printf(u, STATUS_TYPE_NORMAL, marker, format, ident);
                 REENABLE_WARNING;
         }
 }
@@ -720,24 +725,43 @@ static const char* job_done_message_format(Unit *u, JobType t, JobResult result)
         }
 }
 
+/* systemE shows a marker rather than a word. GLYPH_NONE means the result prints no status
+ * column at all, as the six-character words it replaced did for the same results. */
+#define GLYPH_NONE ((Glyph) -1)
+
 static const struct {
         int log_level;
-        const char *color, *word;
+        const char *color;
+        Glyph glyph;
 } job_done_messages[_JOB_RESULT_MAX] = {
-        [JOB_DONE]        = { LOG_INFO,    ANSI_OK_COLOR,         "  OK  " },
-        [JOB_CANCELED]    = { LOG_INFO,                                    },
-        [JOB_TIMEOUT]     = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    " TIME " },
-        [JOB_FAILED]      = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    "FAILED" },
-        [JOB_DEPENDENCY]  = { LOG_WARNING, ANSI_HIGHLIGHT_YELLOW, "DEPEND" },
-        [JOB_SKIPPED]     = { LOG_NOTICE,  ANSI_HIGHLIGHT,        " INFO " },
-        [JOB_INVALID]     = { LOG_INFO,                                    },
-        [JOB_ASSERT]      = { LOG_WARNING, ANSI_HIGHLIGHT_YELLOW, "ASSERT" },
-        [JOB_UNSUPPORTED] = { LOG_WARNING, ANSI_HIGHLIGHT_YELLOW, "UNSUPP" },
-        [JOB_COLLECTED]   = { LOG_INFO,                                    },
-        [JOB_ONCE]        = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    " ONCE " },
-        [JOB_FROZEN]      = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    "FROZEN" },
-        [JOB_CONCURRENCY] = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    "CONCUR" },
+        [JOB_DONE]        = { LOG_INFO,    ANSI_OK_COLOR,         GLYPH_STATUS_OK      },
+        [JOB_CANCELED]    = { LOG_INFO,    NULL,                  GLYPH_NONE           },
+        [JOB_TIMEOUT]     = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    GLYPH_STATUS_FAILED  },
+        [JOB_FAILED]      = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    GLYPH_STATUS_FAILED  },
+        [JOB_DEPENDENCY]  = { LOG_WARNING, ANSI_HIGHLIGHT_YELLOW, GLYPH_STATUS_FAILED  },
+        [JOB_SKIPPED]     = { LOG_NOTICE,  ANSI_HIGHLIGHT,        GLYPH_STATUS_WAITING },
+        [JOB_INVALID]     = { LOG_INFO,    NULL,                  GLYPH_NONE           },
+        [JOB_ASSERT]      = { LOG_WARNING, ANSI_HIGHLIGHT_YELLOW, GLYPH_STATUS_FAILED  },
+        [JOB_UNSUPPORTED] = { LOG_WARNING, ANSI_HIGHLIGHT_YELLOW, GLYPH_STATUS_WAITING },
+        [JOB_COLLECTED]   = { LOG_INFO,    NULL,                  GLYPH_NONE           },
+        [JOB_ONCE]        = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    GLYPH_STATUS_FAILED  },
+        [JOB_FROZEN]      = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    GLYPH_STATUS_STOPPED },
+        [JOB_CONCURRENCY] = { LOG_ERR,     ANSI_HIGHLIGHT_RED,    GLYPH_STATUS_WAITING },
 };
+
+/* "$" plus one glyph, so every marker is two columns wide. See STATUS_INDENT. */
+static const char* job_status_marker(JobType t, JobResult result) {
+        Glyph g = job_done_messages[result].glyph;
+
+        if (g == GLYPH_NONE)
+                return NULL;
+
+        /* A stop that succeeded is not the same event as a start that succeeded. */
+        if (result == JOB_DONE && IN_SET(t, JOB_STOP, JOB_RESTART))
+                g = GLYPH_STATUS_STOPPED;
+
+        return strjoina("$", glyph(g));
+}
 
 static const char* job_done_mid(JobType type, JobResult result) {
         switch (type) {
@@ -776,7 +800,7 @@ static void job_emit_done_message(Unit *u, uint32_t job_id, JobType t, JobResult
 
         ident = unit_status_string(u, &free_ident);
 
-        const char *status = job_done_messages[result].word;
+        const char *status = job_status_marker(t, result);
         bool do_console = t != JOB_RELOAD && status;
         bool console_only = do_console && log_on_console();
 

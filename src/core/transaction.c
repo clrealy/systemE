@@ -8,6 +8,7 @@
 #include "bus-common-errors.h"
 #include "bus-error.h"
 #include "dbus-unit.h"
+#include "glyph-util.h"
 #include "hash-funcs.h"
 #include "manager.h"
 #include "set.h"
@@ -497,10 +498,11 @@ static int transaction_verify_order_one(Transaction *tr, Job *j, Job *from, unsi
                                    LOG_ITEM("DELETED_TYPE=%s", job_type_to_string(delete->type)),
                                    LOG_ITEM("%s", strempty(unit_ids)));
 
+                        const char *marker = strjoina("$", glyph(GLYPH_STATUS_WAITING));
                         if (log_get_show_color())
-                                status = ANSI_HIGHLIGHT_RED " SKIP " ANSI_NORMAL;
+                                status = strjoina(ANSI_HIGHLIGHT_RED, marker, ANSI_NORMAL);
                         else
-                                status = " SKIP ";
+                                status = marker;
 
                         unit_status_printf(delete->unit,
                                            STATUS_TYPE_NOTICE,

@@ -64,6 +64,11 @@ const char* glyph_full(Glyph code, bool force_utf) {
                         [GLYPH_ARROW_LEFT]              = "<-",
                         [GLYPH_ARROW_RIGHT]             = "->",
                         [GLYPH_ELLIPSIS]                = "...",
+                        [GLYPH_STATUS_STARTING]         = ">",
+                        [GLYPH_STATUS_OK]               = "+",
+                        [GLYPH_STATUS_FAILED]           = "x",
+                        [GLYPH_STATUS_STOPPED]          = "=",
+                        [GLYPH_STATUS_WAITING]          = ".",
                         [GLYPH_EXTERNAL_LINK]           = "[LNK]",
                         [GLYPH_ECSTATIC_SMILEY]         = ":-]",
                         [GLYPH_HAPPY_SMILEY]            = ":-}",
@@ -136,6 +141,11 @@ const char* glyph_full(Glyph code, bool force_utf) {
 
                         /* Single glyph in Unicode, three in ASCII */
                         [GLYPH_ELLIPSIS]                = UTF8("…"),       /* actually called: HORIZONTAL ELLIPSIS */
+                        [GLYPH_STATUS_STARTING]         = UTF8("▶"),
+                        [GLYPH_STATUS_OK]               = UTF8("▮"),
+                        [GLYPH_STATUS_FAILED]           = UTF8("✗"),
+                        [GLYPH_STATUS_STOPPED]          = UTF8("‖"),
+                        [GLYPH_STATUS_WAITING]          = UTF8("…"),
 
                         /* Three glyphs in Unicode, five in ASCII */
                         [GLYPH_EXTERNAL_LINK]           = UTF8("[🡕]"),      /* actually called: NORTH EAST SANS-SERIF ARROW, enclosed in [] */
