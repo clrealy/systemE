@@ -89,6 +89,7 @@ cat > "$R/usr/local/sbin/systeme-verdict" <<'VERDICT'
 #!/bin/sh
 echo "PKG-TEST-PACKAGE: $(dpkg-query -W -f '${Package} ${Version}' systeme)"
 echo "PKG-TEST-MANAGER: $(systemctl --version | head -1)"
+echo "PKG-TEST-MULTIUSER: $(systemctl is-active multi-user.target)"
 echo "PKG-TEST-STATE: $(systemctl is-system-running)"
 systemctl --no-pager --no-legend --failed
 echo PKG-TEST-END
@@ -123,14 +124,18 @@ sed -e 's/\x1b\[[0-9;:]*[a-zA-Z]//g' -e 's/\x1b\][^\x07]*\x07//g' "$WORK/boot.lo
 echo
 sed -n '/PKG-TEST-PACKAGE/,/PKG-TEST-END/p' "$WORK/boot.txt" | sed 's/^ *//;s/^\[ *[0-9.]*\] *//;s/^[a-z]*\[[0-9]*\]: //;s/^/  /'
 [ "$KEEP" -eq 1 ] && echo "  console log: $WORK/boot.txt"
-# Any systemd prints "Reached target multi-user.target". Only systemE prints its
-# [$..] status markers, and the verdict must name the systeme package, so both
-# are required: otherwise a boot of the distribution's own systemd would pass.
-reached=0; grep -q "Reached target .*multi-user.target" "$WORK/boot.txt" && reached=1
-markers=$(grep -c '\[\$' "$WORK/boot.txt" || true)
+# The verdict asks systemctl whether multi-user.target is active: status lines
+# show unit descriptions, not names, so grepping for "multi-user.target" fails.
+# Only systemE prints [$..] markers, and the verdict must name the systeme
+# package, so a boot of the distribution's own systemd cannot pass. Both start
+# ([$▶]) and done ([$▮]) markers are required: a done marker that never shows
+# up means the job-result path is broken even if the boot gets there.
+reached=0; grep -q "PKG-TEST-MULTIUSER: active" "$WORK/boot.txt" && reached=1
+starting=$(grep -c '\[\$▶\]' "$WORK/boot.txt" || true)
+done_ok=$(grep -c '\[\$▮\]' "$WORK/boot.txt" || true)
 named=0; grep -q "PKG-TEST-PACKAGE: systeme " "$WORK/boot.txt" && named=1
-echo "  multi-user reached: $reached   systemE markers: $markers   verdict names systeme: $named"
-if [ "$reached" = 1 ] && [ "$markers" -gt 0 ] && [ "$named" = 1 ]; then
+echo "  multi-user active: $reached   [\$▶] lines: $starting   [\$▮] lines: $done_ok   verdict names systeme: $named"
+if [ "$reached" = 1 ] && [ "$starting" -gt 0 ] && [ "$done_ok" -gt 0 ] && [ "$named" = 1 ]; then
         echo "systemE, installed by apt over $SUITE's systemd, reached multi-user.target."
         exit 0
 fi

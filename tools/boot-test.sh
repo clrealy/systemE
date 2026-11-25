@@ -163,6 +163,13 @@ printf '%s\n' "$failed_lines" | sed '/^$/d;s/^/    /'
 sed -n '/BOOT-TEST-STATE/,/BOOT-TEST-END/p' "$WORK/boot.txt" | sed 's/^ *//;s/^\[ *[0-9.]*\] *//' | sed 's/^/  /'
 [ "$KEEP" -eq 1 ] && echo "  console log   : $WORK/boot.txt"
 
+# A boot with no done markers means job results are not reaching the console,
+# which is a systemE bug even when the target is reached.
+if [ "$ok" -eq 0 ]; then
+        echo
+        echo "systemE printed no [\$▮] lines: job-done status is broken." >&2
+        exit 1
+fi
 if grep -q "Reached target .*$TARGET" "$WORK/boot.txt"; then
         echo
         echo "systemE reached $TARGET."
