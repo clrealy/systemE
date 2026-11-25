@@ -23,7 +23,9 @@ usr/lib/${DEB_HOST_MULTIARCH}/libnss_systemd.so.2
 usr/lib/${DEB_HOST_MULTIARCH}/security
 usr/lib/${DEB_HOST_MULTIARCH}/systemd
 usr/share/bash-completion
-usr/share/dbus-1
+usr/share/dbus-1/services
+usr/share/dbus-1/system-services
+usr/share/dbus-1/system.d
 usr/share/doc
 usr/share/factory
 usr/share/mime

@@ -4,3 +4,4 @@ usr/lib/${DEB_HOST_MULTIARCH}/libudev.so
 usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig
 usr/share/pkgconfig
 usr/lib/rpm
+usr/share/dbus-1/interfaces
