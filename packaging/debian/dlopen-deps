@@ -1,0 +1,77 @@
+#!/usr/bin/python3
+# SPDX-License-Identifier: LGPL-2.1-or-later
+"""Fill dlopen:Depends, dlopen:Recommends and dlopen:Suggests for a package.
+
+dh_dlopenlibdeps does this through `dlopen-notes --sonames`, and that mode
+builds a dict from every (soname, priority) pair it reads, so whichever note is
+read last wins. That loses priorities both across files and within one:
+
+  PID 1 declares libmount as required and libsystemd-shared as suggested, so
+  libmount1 came out suggested, though PID 1 cannot boot without it.
+
+  pam_systemd.so carries a required note for libpam from its own code and a
+  suggested one from shared code linked into it, and even on that file alone
+  --sonames reports suggested.
+
+`dlopen-notes --features` merges with max() and gets both right, so this uses
+it. Each package is listed once, at the strongest level any file asks for.
+
+    dlopen-deps PACKAGE
+"""
+import json
+import os
+import subprocess
+import sys
+
+RANK = {'suggested': 1, 'recommended': 2, 'required': 3}
+FIELD = {3: 'Depends', 2: 'Recommends', 1: 'Suggests'}
+
+def elf_files(root):
+    for dirpath, _, names in os.walk(root):
+        if os.path.relpath(dirpath, root).startswith('usr/lib/debug'):
+            continue
+        for n in names:
+            p = os.path.join(dirpath, n)
+            if os.path.islink(p) or not os.path.isfile(p):
+                continue
+            if not (os.access(p, os.X_OK) or '.so' in n):
+                continue
+            with open(p, 'rb') as f:
+                if f.read(4) == b'\x7fELF':
+                    yield p
+
+def soname_priorities(files):
+    files = list(files)
+    if not files:
+        return {}
+    out = subprocess.run(['dlopen-notes', *files, '--features'],
+                         capture_output=True, text=True, check=True).stdout
+    body = '\n'.join(l for l in out.splitlines() if not l.startswith('#'))
+    best = {}
+    for feature in (json.loads(body) if body.strip() else {}).values():
+        for soname, prio in feature['sonames'].items():
+            best[soname] = max(best.get(soname, 0), RANK[prio])
+    return best
+
+def owning_package(soname):
+    out = subprocess.run(['dpkg-query', '--search', '--', soname],
+                         capture_output=True, text=True).stdout
+    for line in out.splitlines():
+        if line.startswith(('local diversion', 'diversion by')):
+            continue
+        return line.split(':', 1)[0]
+    return None   # an alternative soname this system does not have
+
+def main():
+    pkg = sys.argv[1]
+    packages = {}
+    for soname, rank in soname_priorities(elf_files(f'debian/{pkg}')).items():
+        owner = owning_package(soname)
+        if owner and owner != pkg:
+            packages[owner] = max(packages.get(owner, 0), rank)
+    with open(f'debian/{pkg}.substvars', 'a') as sv:
+        for rank, field in FIELD.items():
+            names = sorted(p for p, r in packages.items() if r == rank)
+            sv.write(f'dlopen:{field}={", ".join(names)}\n')
+
+main()

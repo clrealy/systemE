@@ -35,5 +35,9 @@ override_dh_makeshlibs:
 override_dh_installsystemd:
 override_dh_installsystemduser:
 
+# dh_dlopenlibdeps would merge priorities wrongly; see debian/dlopen-deps.
+override_dh_dlopenlibdeps:
+	for p in $(shell dh_listpackages); do debian/dlopen-deps $$p; done
+
 override_dh_missing:
 	dh_missing --fail-missing
